@@ -30,6 +30,7 @@ class User extends Authenticatable
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
             'deleted_at' => 'datetime',
+            'is_admin' => 'boolean',
         ];
     }
 }

@@ -1,8 +1,9 @@
 # Sipeka-MBG
 
-**Sipeka-MBG** (Sistem Pengecekan Kesegaran Bahan untuk MBG) adalah platform yang digunakan oleh SPPG MBG untuk melakukan manajemen bahan makanan yang akan digunakan untuk program MBG. Sistem ini memungkinkan pengguna untuk memantau kualitas bahan baku secara digital melalui integrasi teknologi *Machine Learning*.
+**Sipeka-MBG** (Sistem Pengecekan Kesegaran Bahan untuk MBG) adalah platform yang digunakan oleh SPPG MBG untuk melakukan manajemen bahan makanan yang akan digunakan untuk program MBG. Sistem ini memungkinkan pengguna untuk memantau kualitas bahan baku secara digital melalui integrasi teknologi _Machine Learning_.
 
 ## 👥 Anggota kelompok
+
 1. 245150700111048 - Keihan Radja Vasya
 2. 245150700111017 - Muhammad Iqbal Dhyty Pratama
 3. 245150701111011 - Dionisius Seraf Saputra
@@ -11,6 +12,7 @@
 ## 🎯 Fitur-fitur
 
 ### Fitur Wajib
+
 1. **Freshness Check Makanan MBG**: Mengecek kesegaran bahan makanan berdasarkan foto yang diinput oleh pengguna.
 2. **Storage Input**: Memasukkan data bahan makanan baru ke dalam sistem.
 3. **Storage Edit/Update**: Mengubah atau memperbarui data bahan makanan yang sudah ada.
@@ -18,43 +20,46 @@
 5. **Register/Login**: Akses masuk ke sistem untuk pengguna.
 
 ### Fitur Opsional
+
 1. **Alerting Kadaluarsa Bahan Makanan**: Peringatan otomatis untuk bahan yang akan segera kedaluwarsa.
 2. **Filtering Kategori Bahan Makanan / Durasi Kadaluarsa**: Pemfilteran data untuk memudahkan pencarian bahan.
 3. **Kode Verifikasi SPPG**: Fitur keamanan tambahan untuk verifikasi akses.
 
 ## 👤 _Role_
-| Role | Hak Akses |
-| :--- | :--- |
+
+| Role | Hak Akses                                           |
+| :--- | :-------------------------------------------------- |
 | User | Hak akses penuh ke seluruh fitur interface aplikasi |
 
 ## 🔄 Alur Sistem
 
 **Proses Pengelolaan dan Pengecekan Kesegaran:**
-1. **Akses Utama**: User mengakses halaman utama aplikasi yang menampilkan *storage view* dari SPPG.
+
+1. **Akses Utama**: User mengakses halaman utama aplikasi yang menampilkan _storage view_ dari SPPG.
 2. **Aksi User**: User memilih tombol input atau edit data untuk memperbarui inventaris.
 3. **Input Data**: User menginput data detail bahan makanan beserta fotonya.
-4. **Proses ML**: Sistem mengirimkan data foto bahan makanan tersebut ke model *Machine Learning*.
+4. **Proses ML**: Sistem mengirimkan data foto bahan makanan tersebut ke model _Machine Learning_.
 5. **Output Model**: Model memberikan hasil analisis dalam format JSON ke API.
 6. **Hasil Akhir**: API mengembalikan data JSON tersebut ke halaman hasil untuk ditampilkan kepada user.
 
 ## 🗂️ Desain _Database_
 
 1. **Tabel User**
-   * `Id_user` (Auto increment): PK
-   * `Nama` (Varchar)
-   * `Email` (Varchar)
-   * `Password` (Varchar)
-   * `ID_SPPG` (Varchar): FK
+    - `Id_user` (Auto increment): PK
+    - `Nama` (Varchar)
+    - `Email` (Varchar)
+    - `Password` (Varchar)
+    - `ID_SPPG` (Varchar): FK
 
 2. **Tabel Ingredients**
-   * `ID_Ingredient` (Auto increment): PK
-   * `Nama` (Varchar)
-   * `TanggalDatang` (Date)
-   * `Kadaluarsa` (Date)
-   * `Kuantitas` (Integer)
-   * `Satuan` (Varchar)
-   * `Foto` (Varchar)
-   * `Status_Kesegaran` (Varchar)
+    - `ID_Ingredient` (Auto increment): PK
+    - `Nama` (Varchar)
+    - `TanggalDatang` (Date)
+    - `Kadaluarsa` (Date)
+    - `Kuantitas` (Integer)
+    - `Satuan` (Varchar)
+    - `Foto` (Varchar)
+    - `Status_Kesegaran` (Varchar)
 
 ## 🐳 Menjalankan dengan Docker
 
@@ -67,7 +72,7 @@ Proyek ini menyediakan dua konfigurasi Docker: **development** untuk pengembanga
 
 ### Development
 
-Mode development melakukan *volume mount* kode secara langsung ke container sehingga perubahan file langsung terlihat tanpa rebuild. Vite HMR aktif di port `5173`.
+Mode development melakukan _volume mount_ kode secara langsung ke container sehingga perubahan file langsung terlihat tanpa rebuild. Vite HMR aktif di port `5173`.
 
 ```bash
 # 1. Salin dan isi environment
@@ -104,6 +109,7 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
 ```
 
 Perbedaan utama dibanding mode development:
+
 - Kode aplikasi **di-bake ke dalam image** (tidak ada volume mount)
 - Aset frontend dikompilasi oleh Node di dalam Docker (multi-stage build)
 - `APP_DEBUG=false`, `APP_ENV=production`

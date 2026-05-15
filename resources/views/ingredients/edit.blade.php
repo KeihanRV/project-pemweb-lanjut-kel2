@@ -13,6 +13,20 @@
                         @csrf
                         @method('PUT')
 
+                        <!-- Kitchen -->
+                        <div class="mb-4">
+                            <x-input-label for="kitchen_id" :value="__('Kitchen')" />
+                            <select id="kitchen_id" name="kitchen_id"
+                                class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                @foreach ($kitchens as $kitchen)
+                                    <option value="{{ $kitchen->id }}" @selected(optional($selectedKitchen)->id == $kitchen->id)>
+                                        {{ $kitchen->nama }} ({{ $kitchen->code }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            <x-input-error :messages="$errors->get('kitchen_id')" class="mt-2" />
+                        </div>
+
                         <!-- Nama -->
                         <div class="mb-4">
                             <x-input-label for="nama" :value="__('Nama Bahan')" />

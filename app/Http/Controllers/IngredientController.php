@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ingredient;
+use App\Models\Kitchen;
 use App\Services\FreshnessService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,16 +16,44 @@ class IngredientController extends Controller
         protected FreshnessService $freshnessService
     ) {}
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $ingredients = Ingredient::orderBy('created_at', 'desc')->get();
+        $kitchens = Kitchen::orderBy('nama')->get();
+        $perPage = in_array($request->query('per_page'), ['10', '25', '100'])
+            ? (int) $request->query('per_page')
+            : 10;
 
-        return view('ingredients.index', compact('ingredients'));
+        $ingredients = Ingredient::orderBy('created_at', 'desc')
+            ->paginate($perPage)
+            ->withQueryString();
+        $selectedKitchen = null;
+
+        if ($kitchens->isNotEmpty()) {
+            $selectedKitchen = $kitchens->first();
+
+            if ($request->filled('kitchen')) {
+                $selectedKitchen = $kitchens->firstWhere('id', $request->query('kitchen')) ?? $selectedKitchen;
+            }
+
+            $ingredients = $selectedKitchen->ingredients()
+                ->orderBy('created_at', 'desc')
+                ->paginate($perPage)
+                ->withQueryString();
+        }
+
+        return view('ingredients.index', compact('ingredients', 'kitchens', 'selectedKitchen', 'perPage'));
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
-        return view('ingredients.create');
+        $kitchens = Kitchen::orderBy('nama')->get();
+        $selectedKitchen = null;
+
+        if ($kitchens->isNotEmpty()) {
+            $selectedKitchen = $kitchens->firstWhere('id', $request->query('kitchen')) ?? $kitchens->first();
+        }
+
+        return view('ingredients.create', compact('kitchens', 'selectedKitchen'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -36,6 +65,7 @@ class IngredientController extends Controller
             'kuantitas' => ['required', 'integer', 'min:1'],
             'satuan' => ['required', 'string', 'max:50'],
             'foto' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],
+            'kitchen_id' => ['nullable', 'exists:kitchens,id'],
         ]);
 
         $path = $request->file('foto')->store('ingredients', 'public');
@@ -44,7 +74,7 @@ class IngredientController extends Controller
         $result = $this->freshnessService->check($absolutePath);
         $status = $this->mapPrediction($result['prediction'] ?? 'unknown');
 
-        Ingredient::create([
+        $ingredient = Ingredient::create([
             'nama' => $validated['nama'],
             'tanggal_datang' => $validated['tanggal_datang'],
             'kadaluarsa' => $validated['kadaluarsa'],
@@ -54,15 +84,30 @@ class IngredientController extends Controller
             'status_kesegaran' => $status,
         ]);
 
-        return redirect()->route('ingredients.index')
+        if ($validated['kitchen_id']) {
+            $ingredient->kitchens()->attach($validated['kitchen_id']);
+        }
+
+        return redirect()->route('ingredients.index', ['kitchen' => $validated['kitchen_id'] ?? null])
             ->with('success', 'Ingredient berhasil ditambahkan.');
     }
 
-    public function edit(Ingredient $ingredient): View
+    public function edit(Request $request, Ingredient $ingredient): View
     {
-        return view('ingredients.edit', [
-            'ingredient' => $ingredient,
-        ]);
+        $kitchens = Kitchen::orderBy('nama')->get();
+        $selectedKitchen = null;
+
+        if ($kitchens->isNotEmpty()) {
+            if ($request->filled('kitchen')) {
+                $selectedKitchen = $kitchens->firstWhere('id', $request->query('kitchen'));
+            }
+
+            if (! $selectedKitchen) {
+                $selectedKitchen = $ingredient->kitchens()->first() ?? $kitchens->first();
+            }
+        }
+
+        return view('ingredients.edit', compact('ingredient', 'kitchens', 'selectedKitchen'));
     }
 
     public function update(Request $request, Ingredient $ingredient): RedirectResponse
@@ -74,6 +119,7 @@ class IngredientController extends Controller
             'kuantitas' => ['required', 'integer', 'min:1'],
             'satuan' => ['required', 'string', 'max:50'],
             'foto' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],
+            'kitchen_id' => ['nullable', 'exists:kitchens,id'],
         ]);
 
         $data = [
@@ -99,8 +145,34 @@ class IngredientController extends Controller
 
         $ingredient->update($data);
 
-        return redirect()->route('ingredients.index')
+        if ($validated['kitchen_id']) {
+            $ingredient->kitchens()->syncWithoutDetaching([$validated['kitchen_id']]);
+        }
+
+        return redirect()->route('ingredients.index', ['kitchen' => $validated['kitchen_id'] ?? null])
             ->with('success', 'Ingredient berhasil diperbarui.');
+    }
+
+    public function destroy(Request $request, Ingredient $ingredient): RedirectResponse
+    {
+        $kitchenId = $request->input('kitchen_id');
+
+        if ($kitchenId) {
+            $ingredient->kitchens()->detach($kitchenId);
+
+            if ($ingredient->kitchens()->count() === 0) {
+                $ingredient->delete();
+            }
+
+            return redirect()->route('ingredients.index', ['kitchen' => $kitchenId])
+                ->with('success', 'Ingredient berhasil dihapus dari kitchen.');
+        }
+
+        $ingredient->kitchens()->detach();
+        $ingredient->delete();
+
+        return redirect()->route('ingredients.index')
+            ->with('success', 'Ingredient berhasil dihapus.');
     }
 
     private function mapPrediction(string $prediction): string

@@ -18,7 +18,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::resource('ingredients', IngredientController::class)
-        ->only(['index', 'create', 'store', 'edit', 'update']);
+        ->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {

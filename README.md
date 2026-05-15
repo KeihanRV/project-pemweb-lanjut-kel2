@@ -51,3 +51,76 @@
    * `Nama` (Varchar)
    * `TanggalMasuk` (Date)
    * `Kadaluarsa
+
+## 🐳 Menjalankan dengan Docker
+
+Proyek ini menyediakan dua konfigurasi Docker: **development** untuk pengembangan lokal dengan hot reload, dan **production** untuk deployment.
+
+### Prasyarat
+
+- [Docker](https://docs.docker.com/get-docker/) dan Docker Compose v2 terinstal
+- File `.env` sudah dikonfigurasi (salin dari `.env.example`)
+
+### Development
+
+Mode development melakukan *volume mount* kode secara langsung ke container sehingga perubahan file langsung terlihat tanpa rebuild. Vite HMR aktif di port `5173`.
+
+```bash
+# 1. Salin dan isi environment
+cp .env.example .env
+# Edit .env — pastikan mengisi variabel berikut:
+#   ML_API_URL=http://alamat-api-ml-anda
+#   DB_DATABASE=sipeka
+#   DB_USERNAME=sipeka
+#   DB_PASSWORD=secret
+
+# 2. Jalankan semua service
+docker compose up --build
+
+# Aplikasi berjalan di http://localhost
+# Vite HMR berjalan di http://localhost:5173
+```
+
+Service yang berjalan:
+| Service | Keterangan |
+| :--- | :--- |
+| `app` | PHP-FPM 8.3 |
+| `nginx` | Web server, port 80 |
+| `db` | MySQL 8.0 |
+| `queue` | Laravel queue worker |
+| `vite` | Vite dev server + HMR, port 5173 |
+
+### Production
+
+Mode production melakukan build aset frontend di dalam Docker (tidak perlu `npm run build` lokal), menonaktifkan debug, dan mengaktifkan cache konfigurasi/route/view.
+
+```bash
+# Jalankan dengan menggabungkan kedua compose file
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
+```
+
+Perbedaan utama dibanding mode development:
+- Kode aplikasi **di-bake ke dalam image** (tidak ada volume mount)
+- Aset frontend dikompilasi oleh Node di dalam Docker (multi-stage build)
+- `APP_DEBUG=false`, `APP_ENV=production`
+- Cache config, route, dan view diaktifkan otomatis saat build
+- Service `vite` tidak berjalan
+
+### Perintah berguna
+
+```bash
+# Melihat log semua service
+docker compose logs -f
+
+# Masuk ke shell container app
+docker compose exec app bash
+
+# Jalankan artisan command
+docker compose exec app php artisan <perintah>
+
+# Menghentikan semua service
+docker compose down
+
+# Menghentikan dan menghapus volume database (reset data)
+docker compose down -v
+```

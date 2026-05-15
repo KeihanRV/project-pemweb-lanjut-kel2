@@ -1,0 +1,38 @@
+services:
+  app:
+    build:
+      context: .
+      target: production
+    volumes: []  # no volume mounts — code is baked in
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+    restart: always
+
+  nginx:
+    volumes:
+      # In prod the app image has the code; nginx needs a shared volume for /public
+      - app_public:/var/www/html/public:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: always
+
+  queue:
+    build:
+      context: .
+      target: production
+    volumes: []
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+    restart: always
+
+  # No vite service in production — assets are baked into the image
+  vite:
+    profiles: ["dev-only"]  # effectively disables it in prod compose
+
+  db:
+    restart: always
+
+volumes:
+  app_public:
+  db_data:

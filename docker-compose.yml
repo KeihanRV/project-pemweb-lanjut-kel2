@@ -1,0 +1,85 @@
+services:
+  app:
+    build:
+      context: .
+      target: development
+    volumes:
+      - .:/var/www/html
+      # Prevent host node_modules/vendor from overriding container's
+      - /var/www/html/node_modules
+    env_file: .env
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:-project_pawl}
+      DB_USERNAME: ${DB_USERNAME:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-Harvey.33}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    restart: unless-stopped
+
+  queue:
+    build:
+      context: .
+      target: development
+    command: ["php", "artisan", "queue:work", "--sleep=3", "--tries=3", "--max-time=3600"]
+    volumes:
+      - .:/var/www/html
+      - /var/www/html/node_modules
+    env_file: .env
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:-project_pawl}
+      DB_USERNAME: ${DB_USERNAME:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-Harvey.33}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  vite:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm ci --ignore-scripts && npm run dev -- --host"
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.0
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-project_pawl}
+      # MYSQL_USER: ${DB_USERNAME:-root}
+      # MYSQL_PASSWORD: ${DB_PASSWORD:-Harvey.33}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-Harvey.33}
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+volumes:
+  db_data:

@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Input Bahan Makanan Baru') }}
+            {{ __('Input Ingredient Baru') }}
         </h2>
     </x-slot>
 
@@ -9,7 +9,7 @@
         <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <form method="POST" action="{{ route('bahan-makanan.store') }}" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('ingredients.store') }}" enctype="multipart/form-data">
                         @csrf
 
                         <!-- Nama -->
@@ -20,12 +20,20 @@
                             <x-input-error :messages="$errors->get('nama')" class="mt-2" />
                         </div>
 
-                        <!-- Tanggal Masuk -->
+                        <!-- Tanggal Datang -->
                         <div class="mb-4">
-                            <x-input-label for="tanggal_masuk" :value="__('Tanggal Masuk')" />
-                            <x-text-input id="tanggal_masuk" name="tanggal_masuk" type="date" class="mt-1 block w-full"
-                                :value="old('tanggal_masuk')" required />
-                            <x-input-error :messages="$errors->get('tanggal_masuk')" class="mt-2" />
+                            <x-input-label for="tanggal_datang" :value="__('Tanggal Datang')" />
+                            <x-text-input id="tanggal_datang" name="tanggal_datang" type="date" class="mt-1 block w-full"
+                                :value="old('tanggal_datang')" required />
+                            <x-input-error :messages="$errors->get('tanggal_datang')" class="mt-2" />
+                        </div>
+
+                        <!-- Kadaluarsa -->
+                        <div class="mb-4">
+                            <x-input-label for="kadaluarsa" :value="__('Kadaluarsa')" />
+                            <x-text-input id="kadaluarsa" name="kadaluarsa" type="date" class="mt-1 block w-full"
+                                :value="old('kadaluarsa')" required />
+                            <x-input-error :messages="$errors->get('kadaluarsa')" class="mt-2" />
                         </div>
 
                         <!-- Kuantitas & Satuan -->
@@ -66,7 +74,7 @@
 
                         <div class="flex items-center gap-4">
                             <x-primary-button>{{ __('Simpan') }}</x-primary-button>
-                            <a href="{{ route('bahan-makanan.index') }}"
+                            <a href="{{ route('ingredients.index') }}"
                                class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150">
                                 Batal
                             </a>

@@ -12,9 +12,9 @@ services:
       DB_CONNECTION: mysql
       DB_HOST: db
       DB_PORT: 3306
-      DB_DATABASE: ${DB_DATABASE:-sipeka}
-      DB_USERNAME: ${DB_USERNAME:-sipeka}
-      DB_PASSWORD: ${DB_PASSWORD:-secret}
+      DB_DATABASE: ${DB_DATABASE:-project_pawl}
+      DB_USERNAME: ${DB_USERNAME:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-Harvey.33}
     depends_on:
       db:
         condition: service_healthy
@@ -44,9 +44,9 @@ services:
       DB_CONNECTION: mysql
       DB_HOST: db
       DB_PORT: 3306
-      DB_DATABASE: ${DB_DATABASE:-sipeka}
-      DB_USERNAME: ${DB_USERNAME:-sipeka}
-      DB_PASSWORD: ${DB_PASSWORD:-secret}
+      DB_DATABASE: ${DB_DATABASE:-project_pawl}
+      DB_USERNAME: ${DB_USERNAME:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-Harvey.33}
     depends_on:
       db:
         condition: service_healthy
@@ -65,11 +65,13 @@ services:
 
   db:
     image: mysql:8.0
+    ports:
+      - "3307:3306"
     environment:
-      MYSQL_DATABASE: ${DB_DATABASE:-sipeka}
-      MYSQL_USER: ${DB_USERNAME:-sipeka}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootsecret}
+      MYSQL_DATABASE: ${DB_DATABASE:-project_pawl}
+      # MYSQL_USER: ${DB_USERNAME:-root}
+      # MYSQL_PASSWORD: ${DB_PASSWORD:-Harvey.33}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-Harvey.33}
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:

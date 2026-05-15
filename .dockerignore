@@ -2,6 +2,7 @@
 .claude
 node_modules
 vendor
+public/storage
 public/build
 public/hot
 storage/logs/*.log

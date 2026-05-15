@@ -46,11 +46,15 @@
    * `Password` (Varchar)
    * `ID_SPPG` (Varchar): FK
 
-2. **Tabel BahanMakanan**
-   * `ID_Bahan` (Auto increment): PK
+2. **Tabel Ingredients**
+   * `ID_Ingredient` (Auto increment): PK
    * `Nama` (Varchar)
-   * `TanggalMasuk` (Date)
-   * `Kadaluarsa
+   * `TanggalDatang` (Date)
+   * `Kadaluarsa` (Date)
+   * `Kuantitas` (Integer)
+   * `Satuan` (Varchar)
+   * `Foto` (Varchar)
+   * `Status_Kesegaran` (Varchar)
 
 ## 🐳 Menjalankan dengan Docker
 

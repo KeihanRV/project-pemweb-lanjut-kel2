@@ -10,54 +10,93 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
+
 class IngredientController extends Controller
 {
     public function __construct(
         protected FreshnessService $freshnessService
     ) {}
 
-    public function index(Request $request): View
+    public function index(Request $request): View|RedirectResponse
     {
-        $kitchens = Kitchen::orderBy('nama')->get();
+        $user = auth()->user();
         $perPage = in_array($request->query('per_page'), ['10', '25', '100'])
             ? (int) $request->query('per_page')
             : 10;
 
-        $ingredients = Ingredient::orderBy('created_at', 'desc')
-            ->paginate($perPage)
-            ->withQueryString();
-        $selectedKitchen = null;
-
-        if ($kitchens->isNotEmpty()) {
-            $selectedKitchen = $kitchens->first();
-
-            if ($request->filled('kitchen')) {
-                $selectedKitchen = $kitchens->firstWhere('id', $request->query('kitchen')) ?? $selectedKitchen;
-            }
-
-            $ingredients = $selectedKitchen->ingredients()
-                ->orderBy('created_at', 'desc')
+        // If user is admin, show the admin view
+        if ($user->is_admin) {
+            $kitchens = Kitchen::orderBy('nama')->get();
+            $ingredients = Ingredient::orderBy('created_at', 'desc')
                 ->paginate($perPage)
                 ->withQueryString();
+            $selectedKitchen = null;
+
+            if ($kitchens->isNotEmpty()) {
+                $selectedKitchen = $kitchens->first();
+
+                if ($request->filled('kitchen')) {
+                    $selectedKitchen = $kitchens->firstWhere('id', $request->query('kitchen')) ?? $selectedKitchen;
+                }
+
+                $ingredients = $selectedKitchen->ingredients()
+                    ->orderBy('created_at', 'desc')
+                    ->paginate($perPage)
+                    ->withQueryString();
+            }
+
+            return view('ingredients.index', compact('ingredients', 'kitchens', 'selectedKitchen', 'perPage'));
         }
 
-        return view('ingredients.index', compact('ingredients', 'kitchens', 'selectedKitchen', 'perPage'));
+        // If user is not admin, show user view (ingredients from their kitchen only)
+        if (!$user->kitchen_id) {
+            return redirect()->route('kitchen-code.show');
+        }
+
+        $kitchen = $user->kitchen;
+        $ingredients = $kitchen->ingredients()
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage)
+            ->withQueryString();
+
+        return view('ingredients.user-index', compact('ingredients', 'kitchen', 'perPage'));
     }
 
     public function create(Request $request): View
     {
-        $kitchens = Kitchen::orderBy('nama')->get();
-        $selectedKitchen = null;
+        $user = auth()->user();
 
-        if ($kitchens->isNotEmpty()) {
-            $selectedKitchen = $kitchens->firstWhere('id', $request->query('kitchen')) ?? $kitchens->first();
+        // If user is not admin and doesn't have a kitchen, redirect
+        if (!$user->is_admin && !$user->kitchen_id) {
+            return redirect()->route('kitchen-code.show');
         }
 
-        return view('ingredients.create', compact('kitchens', 'selectedKitchen'));
+        // If user is admin, show all kitchens
+        if ($user->is_admin) {
+            $kitchens = Kitchen::orderBy('nama')->get();
+            $selectedKitchen = null;
+
+            if ($kitchens->isNotEmpty()) {
+                $selectedKitchen = $kitchens->firstWhere('id', $request->query('kitchen')) ?? $kitchens->first();
+            }
+
+            return view('ingredients.create', compact('kitchens', 'selectedKitchen'));
+        }
+
+        // If user is not admin, show only their kitchen
+        $kitchen = $user->kitchen;
+        return view('ingredients.user-create', compact('kitchen'));
     }
 
     public function store(Request $request): RedirectResponse
     {
+        $user = auth()->user();
+
+        // Check if user has permission
+        if (!$user->is_admin && !$user->kitchen_id) {
+            return redirect()->route('kitchen-code.show');
+        }
+
         $validated = $request->validate([
             'nama' => ['required', 'string', 'max:255'],
             'tanggal_datang' => ['required', 'date'],
@@ -67,6 +106,11 @@ class IngredientController extends Controller
             'foto' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],
             'kitchen_id' => ['nullable', 'exists:kitchens,id'],
         ]);
+
+        // If user is not admin, force kitchen_id to be their kitchen
+        if (!$user->is_admin) {
+            $validated['kitchen_id'] = $user->kitchen_id;
+        }
 
         $path = $request->file('foto')->store('ingredients', 'public');
         $absolutePath = Storage::disk('public')->path($path);
@@ -94,6 +138,20 @@ class IngredientController extends Controller
 
     public function edit(Request $request, Ingredient $ingredient): View
     {
+        $user = auth()->user();
+
+        // If user is not admin, check if ingredient belongs to their kitchen
+        if (!$user->is_admin) {
+            $userKitchenIds = $ingredient->kitchens()->pluck('kitchens.id')->toArray();
+            if (!in_array($user->kitchen_id, $userKitchenIds)) {
+                abort(403, 'Unauthorized');
+            }
+
+            $kitchen = $user->kitchen;
+            return view('ingredients.user-edit', compact('ingredient', 'kitchen'));
+        }
+
+        // Admin view
         $kitchens = Kitchen::orderBy('nama')->get();
         $selectedKitchen = null;
 
@@ -102,7 +160,7 @@ class IngredientController extends Controller
                 $selectedKitchen = $kitchens->firstWhere('id', $request->query('kitchen'));
             }
 
-            if (! $selectedKitchen) {
+            if (!$selectedKitchen) {
                 $selectedKitchen = $ingredient->kitchens()->first() ?? $kitchens->first();
             }
         }
@@ -112,6 +170,16 @@ class IngredientController extends Controller
 
     public function update(Request $request, Ingredient $ingredient): RedirectResponse
     {
+        $user = auth()->user();
+
+        // If user is not admin, check if ingredient belongs to their kitchen
+        if (!$user->is_admin) {
+            $userKitchenIds = $ingredient->kitchens()->pluck('kitchens.id')->toArray();
+            if (!in_array($user->kitchen_id, $userKitchenIds)) {
+                abort(403, 'Unauthorized');
+            }
+        }
+
         $validated = $request->validate([
             'nama' => ['required', 'string', 'max:255'],
             'tanggal_datang' => ['required', 'date'],
@@ -121,6 +189,11 @@ class IngredientController extends Controller
             'foto' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],
             'kitchen_id' => ['nullable', 'exists:kitchens,id'],
         ]);
+
+        // If user is not admin, force kitchen_id to be their kitchen
+        if (!$user->is_admin) {
+            $validated['kitchen_id'] = $user->kitchen_id;
+        }
 
         $data = [
             'nama' => $validated['nama'],
@@ -155,6 +228,16 @@ class IngredientController extends Controller
 
     public function destroy(Request $request, Ingredient $ingredient): RedirectResponse
     {
+        $user = auth()->user();
+
+        // If user is not admin, check if ingredient belongs to their kitchen
+        if (!$user->is_admin) {
+            $userKitchenIds = $ingredient->kitchens()->pluck('kitchens.id')->toArray();
+            if (!in_array($user->kitchen_id, $userKitchenIds)) {
+                abort(403, 'Unauthorized');
+            }
+        }
+
         $kitchenId = $request->input('kitchen_id');
 
         if ($kitchenId) {

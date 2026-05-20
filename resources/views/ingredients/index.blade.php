@@ -89,7 +89,7 @@
                                             @elseif ($item->status_kesegaran === 'tidak segar' || $item->status_kesegaran === 'busuk')
                                                 <span class="bg-[#EC221F] text-[#FFFFFF] px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider">Busuk</span>
                                             @else
-                                                <span class="bg-[#E5A000] text-[#FFFFFF] px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider">Rawan</span>
+                                                <span class="bg-gray-200 text-gray-600 px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider">Unknown</span>
                                             @endif
                                         </td>
                                         

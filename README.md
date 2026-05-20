@@ -9,6 +9,11 @@
 3. 245150701111011 - Dionisius Seraf Saputra
 4. 245150701111017 - Ezekiel Aaron Marmora
 
+## Latar Belakang
+**Program Makan Bergizi Gratis (MBG)** merupakan salah satu pilar strategis pemerintah dalam meningkatkan kualitas sumber daya manusia, menekan angka stunting, serta memastikan pemenuhan gizi seimbang bagi generasi muda sejak dini. Keberhasilan program berskala nasional ini sangat bergantung pada rantai pasok dan operasional Satuan Pelayanan Program Gizi (SPPG) sebagai garda terdepan penyedia makanan.
+
+Dalam implementasinya, mutu dan keamanan pangan dalam MBG masih cukup memprihatinkan. Banyak bahan makanan yang tidak segar atau terkontaminasi tidak hanya menurunkan nilai gizi, tetapi juga membawa risiko fatal bagi kesehatan penerima manfaat. Oleh karena itu, SIPEKA diharapkan pengawasan kualitas bahan baku di tingkat SPPG mutlak diperlukan sebelum proses pengolahan dilakukan.
+
 ## 🎯 Fitur-fitur
 
 ### Fitur Wajib

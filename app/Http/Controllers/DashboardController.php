@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Ingredient;
 use App\Models\Kitchen;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -62,6 +63,39 @@ class DashboardController extends Controller
             'lineLabels',
             'lineData',
             'ingredients',
+        ));
+    }
+
+    public function adminIndex(): View
+    {
+        $totalIngredients = Ingredient::count();
+        $totalKitchens    = Kitchen::count();
+        $totalUsers       = User::count();
+
+        $freshnessCounts = Ingredient::select('status_kesegaran', DB::raw('count(*) as total'))
+            ->groupBy('status_kesegaran')
+            ->pluck('total', 'status_kesegaran');
+
+        $donutData = [
+            'tidak segar'     => $freshnessCounts->get('tidak segar', 0),
+            'tidak diketahui' => $freshnessCounts->get('tidak diketahui', 0),
+            'segar'           => $freshnessCounts->get('segar', 0),
+        ];
+
+        $kitchens = Kitchen::withCount('ingredients')->orderBy('nama')->get();
+
+        $recentIngredients = Ingredient::with('kitchens')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('admin.dashboard', compact(
+            'totalIngredients',
+            'totalKitchens',
+            'totalUsers',
+            'donutData',
+            'kitchens',
+            'recentIngredients',
         ));
     }
 }

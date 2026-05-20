@@ -1,11 +1,10 @@
 <aside class="w-64 h-screen bg-white border-r border-gray-100 flex flex-col justify-between p-4 font-sans text-gray-600">
     <div>
         <div class="flex items-center gap-3 px-3 py-4 border-b border-gray-50">
-            <svg class="w-8 h-8 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
-            </svg>
-            <span class="text-2xl font-bold tracking-wider text-slate-700">SIPEKA</span>
-        </div>
+    <img src="{{ asset('images/android-chrome-192x192.png') }}" alt="SIPEKA Logo" class="w-9 h-9 object-contain">
+    
+    <span class="text-2xl font-bold tracking-wider text-slate-700">SIPEKA</span>
+</div>
 
        <a href="{{ route('dashboard') }}" 
        class="flex items-center gap-4 px-4 py-3 text-sm font-medium transition-all rounded-xl

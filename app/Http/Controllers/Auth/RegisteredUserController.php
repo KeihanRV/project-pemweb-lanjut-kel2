@@ -46,6 +46,6 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(route('ingredients.index', absolute: false));
+        return redirect(route('kitchen-code.show', absolute: false));
     }
 }

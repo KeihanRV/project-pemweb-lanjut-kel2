@@ -43,7 +43,7 @@
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-3">
                                 <span class="w-4 h-4 rounded-full bg-[#E5A000]"></span>
-                                <span class="text-gray-700 font-medium">Rawan</span>
+                                <span class="text-gray-700 font-medium">Unknown</span>
                             </div>
                             <span class="text-gray-500 text-sm">{{ $donutData['tidak diketahui'] }}</span>
                         </div>
@@ -98,7 +98,7 @@
                                     $label = match($status) {
                                         'segar'           => ['text' => 'Segar',  'class' => 'bg-[#22C55E]/20 text-[#22C55E]'],
                                         'tidak segar'     => ['text' => 'Busuk',  'class' => 'bg-[#EC221F] text-white'],
-                                        'tidak diketahui' => ['text' => 'Rawan',  'class' => 'bg-[#E5A000] text-white'],
+                                        'tidak diketahui' => ['text' => 'Unknown', 'class' => 'bg-[#E5A000] text-white'],
                                         default           => ['text' => '-',      'class' => 'bg-gray-100 text-gray-500'],
                                     };
                                 @endphp

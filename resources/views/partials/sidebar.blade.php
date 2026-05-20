@@ -39,23 +39,7 @@
                 <span>Profile</span>
             </a>
 
-            <a href="#" class="flex items-center gap-4 px-4 py-3 text-sm font-medium text-gray-400 rounded-xl hover:bg-gray-50 transition-colors">
-                <div class="p-2 bg-white shadow-sm rounded-xl border border-gray-50">
-                    <svg class="w-4 h-4 text-teal-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"></path>
-                    </svg>
-                </div>
-                <span>Sign In</span>
-            </a>
 
-            <a href="#" class="flex items-center gap-4 px-4 py-3 text-sm font-medium text-gray-400 rounded-xl hover:bg-gray-50 transition-colors">
-                <div class="p-2 bg-white shadow-sm rounded-xl border border-gray-50">
-                    <svg class="w-4 h-4 text-teal-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
-                    </svg>
-                </div>
-                <span>Sign Up</span>
-            </a>
         </nav>
     </div>
 

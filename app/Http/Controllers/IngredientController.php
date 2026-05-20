@@ -62,7 +62,7 @@ class IngredientController extends Controller
         return view('ingredients.user-index', compact('ingredients', 'kitchen', 'perPage'));
     }
 
-    public function create(Request $request): View
+    public function create(Request $request): View|RedirectResponse
     {
         $user = auth()->user();
 

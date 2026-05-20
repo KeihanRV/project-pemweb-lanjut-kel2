@@ -1,101 +1,111 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIPEKA — Input Ingredient Baru</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+<body class="bg-gray-50/50 antialiased font-sans">
+
+    <header class="max-w-5xl mx-auto pt-12 px-4 sm:px-6 lg:px-8">
+        <div class="text-xs text-gray-500 mb-1">Pages / <span class="text-[#242D2D]">Dashboard</span></div>
+        <h2 class="font-bold text-xl text-[#242D2D] leading-tight">
             {{ __('Input Ingredient Baru') }}
         </h2>
-    </x-slot>
+    </header>
 
-    <div class="py-12">
-        <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <form method="POST" action="{{ route('ingredients.store') }}" enctype="multipart/form-data">
-                        @csrf
+    <main class="py-6 min-h-screen">
+        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white border border-[#B2C3C4]/60 rounded-3xl shadow-sm p-10">
+                
+                <form method="POST" action="{{ route('ingredients.store') }}" enctype="multipart/form-data" class="space-y-6">
+                    @csrf
 
-                        <!-- Kitchen -->
-                        <div class="mb-4">
-                            <x-input-label for="kitchen_id" :value="__('Kitchen')" />
-                            <select id="kitchen_id" name="kitchen_id"
-                                class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                                @foreach ($kitchens as $kitchen)
-                                    <option value="{{ $kitchen->id }}" @selected(optional($selectedKitchen)->id == $kitchen->id)>
-                                        {{ $kitchen->nama }} ({{ $kitchen->code }})
-                                    </option>
-                                @endforeach
-                            </select>
-                            <x-input-error :messages="$errors->get('kitchen_id')" class="mt-2" />
+                    <input type="hidden" name="kitchen_id" value="{{ $selectedKitchen ? $selectedKitchen->id : ($kitchens->first() ? $kitchens->first()->id : '') }}">
+
+                    <div>
+                        <label for="nama" class="block text-sm font-bold text-[#242D2D] mb-2">Nama Bahan</label>
+                        <input id="nama" name="nama" type="text" 
+                               class="w-full bg-[#F8FAFA] border border-[#242D2D] rounded-2xl p-4 text-[#242D2D] placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#7EC9CE] focus:border-[#7EC9CE] transition"
+                               placeholder="Bawang Putih" value="{{ old('nama') }}" required autofocus />
+                        <x-input-error :messages="$errors->get('nama')" class="mt-2" />
+                    </div>
+
+                    <div>
+                        <label for="tanggal_datang" class="block text-sm font-bold text-[#242D2D] mb-2">Tanggal Masuk</label>
+                        <input id="tanggal_datang" name="tanggal_datang" type="date" 
+                               class="w-full bg-[#F8FAFA] border border-[#242D2D] rounded-2xl p-4 text-[#242D2D] focus:outline-none focus:ring-1 focus:ring-[#7EC9CE] focus:border-[#7EC9CE] transition"
+                               value="{{ old('tanggal_datang') }}" required />
+                        <input type="hidden" name="kadaluarsa" id="kadaluarsa" value="{{ old('kadaluarsa') }}">
+                        <x-input-error :messages="$errors->get('tanggal_datang')" class="mt-2" />
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                        <div class="md:col-span-7">
+                            <label for="kuantitas" class="block text-sm font-bold text-[#242D2D] mb-2">Kuantitas</label>
+                            <input id="kuantitas" name="kuantitas" type="number" min="1"
+                                   class="w-full bg-[#F8FAFA] border border-[#242D2D] rounded-2xl p-4 text-[#242D2D] focus:outline-none focus:ring-1 focus:ring-[#7EC9CE] focus:border-[#7EC9CE] transition"
+                                   placeholder="100" value="{{ old('kuantitas') }}" required />
+                            <x-input-error :messages="$errors->get('kuantitas')" class="mt-2" />
                         </div>
-
-                        <!-- Nama -->
-                        <div class="mb-4">
-                            <x-input-label for="nama" :value="__('Nama Bahan')" />
-                            <x-text-input id="nama" name="nama" type="text" class="mt-1 block w-full"
-                                :value="old('nama')" required autofocus />
-                            <x-input-error :messages="$errors->get('nama')" class="mt-2" />
-                        </div>
-
-                        <!-- Tanggal Datang -->
-                        <div class="mb-4">
-                            <x-input-label for="tanggal_datang" :value="__('Tanggal Datang')" />
-                            <x-text-input id="tanggal_datang" name="tanggal_datang" type="date" class="mt-1 block w-full"
-                                :value="old('tanggal_datang')" required />
-                            <x-input-error :messages="$errors->get('tanggal_datang')" class="mt-2" />
-                        </div>
-
-                        <!-- Kadaluarsa -->
-                        <div class="mb-4">
-                            <x-input-label for="kadaluarsa" :value="__('Kadaluarsa')" />
-                            <x-text-input id="kadaluarsa" name="kadaluarsa" type="date" class="mt-1 block w-full"
-                                :value="old('kadaluarsa')" required />
-                            <x-input-error :messages="$errors->get('kadaluarsa')" class="mt-2" />
-                        </div>
-
-                        <!-- Kuantitas & Satuan -->
-                        <div class="mb-4 grid grid-cols-3 gap-4">
-                            <div class="col-span-2">
-                                <x-input-label for="kuantitas" :value="__('Kuantitas')" />
-                                <x-text-input id="kuantitas" name="kuantitas" type="number" min="1"
-                                    class="mt-1 block w-full" :value="old('kuantitas')" required />
-                                <x-input-error :messages="$errors->get('kuantitas')" class="mt-2" />
-                            </div>
-                            <div>
-                                <x-input-label for="satuan" :value="__('Satuan')" />
+                        
+                        <div class="md:col-span-5">
+                            <label for="satuan" class="block text-sm font-bold text-[#242D2D] mb-2">Satuan</label>
+                            <div class="relative">
                                 <select id="satuan" name="satuan"
-                                    class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                                    <option value="">Pilih</option>
-                                    <option value="kg" {{ old('satuan') === 'kg' ? 'selected' : '' }}>kg</option>
-                                    <option value="gram" {{ old('satuan') === 'gram' ? 'selected' : '' }}>gram</option>
-                                    <option value="liter" {{ old('satuan') === 'liter' ? 'selected' : '' }}>liter</option>
-                                    <option value="ml" {{ old('satuan') === 'ml' ? 'selected' : '' }}>ml</option>
-                                    <option value="butir" {{ old('satuan') === 'butir' ? 'selected' : '' }}>butir</option>
-                                    <option value="ikat" {{ old('satuan') === 'ikat' ? 'selected' : '' }}>ikat</option>
-                                    <option value="buah" {{ old('satuan') === 'buah' ? 'selected' : '' }}>buah</option>
-                                    <option value="bungkus" {{ old('satuan') === 'bungkus' ? 'selected' : '' }}>bungkus</option>
+                                        class="w-full bg-[#F8FAFA] border border-[#242D2D] rounded-2xl p-4 text-[#242D2D] focus:outline-none focus:ring-1 focus:ring-[#7EC9CE] focus:border-[#7EC9CE] transition appearance-none cursor-pointer" required>
+                                    <option value="" class="text-gray-400">Kg</option>
+                                    @foreach (['kg', 'gram', 'liter', 'ml', 'butir', 'ikat', 'buah', 'bungkus'] as $s)
+                                        <option value="{{ $s }}" {{ old('satuan') === $s ? 'selected' : '' }}>{{ $s }}</option>
+                                    @endforeach
                                 </select>
-                                <x-input-error :messages="$errors->get('satuan')" class="mt-2" />
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#242D2D]">
+                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                                </div>
                             </div>
+                            <x-input-error :messages="$errors->get('satuan')" class="mt-2" />
                         </div>
+                    </div>
 
-                        <!-- Foto -->
-                        <div class="mb-6">
-                            <x-input-label for="foto" :value="__('Foto Bahan')" />
-                            <input id="foto" name="foto" type="file" accept="image/jpeg,image/jpg,image/png,image/webp"
-                                class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-                                required />
-                            <p class="mt-1 text-xs text-gray-400">Format: jpeg, jpg, png, webp. Maks: 5MB.</p>
-                            <x-input-error :messages="$errors->get('foto')" class="mt-2" />
+                    <div>
+                        <label class="block text-sm font-bold text-[#242D2D] mb-2">Foto Bahan (opsional)</label>
+                        <div class="flex items-center gap-4 mt-2">
+                            <label for="foto" class="cursor-pointer bg-[#D8E8E9] text-[#242D2D] font-bold px-6 py-3.5 rounded-2xl border border-[#242D2D]/30 hover:bg-opacity-80 transition shadow-sm text-sm">
+                                Pilih Gambar
+                            </label>
+                            <input id="foto" name="foto" type="file" accept="image/jpeg,image/jpg,image/png,image/webp" class="hidden" />
+                            <span id="file-name" class="text-sm text-gray-400 font-medium">Tidak Ada Gambar Yang Dipilih</span>
                         </div>
+                        <p class="mt-2 text-xs text-gray-400">Format target: jpeg, jpg, png, webp. Maksimal asset: 5MB.</p>
+                        <x-input-error :messages="$errors->get('foto')" class="mt-2" />
+                    </div>
 
-                        <div class="flex items-center gap-4">
-                            <x-primary-button>{{ __('Simpan') }}</x-primary-button>
-                            <a href="{{ route('ingredients.index') }}"
-                               class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150">
-                                Batal
-                            </a>
-                        </div>
-                    </form>
-                </div>
+                    <div class="flex items-center gap-4 pt-6">
+                        <button type="submit" class="bg-[#242D2D] text-white px-12 py-3.5 rounded-2xl font-bold uppercase text-sm tracking-wider shadow-sm hover:bg-opacity-90 transition">
+                            SIMPAN
+                        </button>
+                        
+                        <a href="{{ route('ingredients.index') }}"
+                           class="bg-white text-[#242D2D] px-12 py-3.5 rounded-2xl font-bold uppercase text-sm tracking-wider border border-[#242D2D] shadow-sm hover:bg-gray-50 transition text-center">
+                            BATAL
+                        </a>
+                    </div>
+                </form>
+
             </div>
         </div>
-    </div>
-</x-app-layout>
+    </main>
+
+    <script>
+        document.getElementById('foto').addEventListener('change', function() {
+            const fileNameSpan = document.getElementById('file-name');
+            fileNameSpan.textContent = this.files.length > 0 ? this.files[0].name : "Tidak Ada Gambar Yang Dipilih";
+        });
+
+        document.getElementById('tanggal_datang').addEventListener('change', function() {
+            document.getElementById('kadaluarsa').value = this.value;
+        });
+    </script>
+</body>
+</html>

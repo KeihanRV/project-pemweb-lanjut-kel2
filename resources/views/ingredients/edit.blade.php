@@ -77,13 +77,7 @@
                                 
                                 <div class="flex items-center gap-2 text-sm font-bold text-[#242D2D]">
                                     <span>Status:</span>
-                                    @if ($ingredient->status_kesegaran === 'segar')
-                                        <span class="bg-[#D1FAE5] text-[#065F46] px-3 py-1 rounded-md text-xs font-semibold uppercase tracking-wide">Segar</span>
-                                    @elseif ($ingredient->status_kesegaran === 'tidak segar' || $ingredient->status_kesegaran === 'busuk')
-                                        <span class="bg-[#FEE2E2] text-[#991B1B] px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wide">Busuk</span>
-                                    @else
-                                        <span class="bg-[#FEF3C7] text-[#92400E] px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wide">Rawan</span>
-                                    @endif
+                                    <x-freshness-badge :status="$ingredient->status_kesegaran" />
                                 </div>
                             </div>
                         </div>

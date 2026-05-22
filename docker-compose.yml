@@ -14,7 +14,7 @@ services:
       DB_PORT: 3306
       DB_DATABASE: ${DB_DATABASE:-project_pawl}
       DB_USERNAME: ${DB_USERNAME:-root}
-      DB_PASSWORD: ${DB_PASSWORD:-Harvey.33}
+      DB_PASSWORD: ""
     depends_on:
       db:
         condition: service_healthy
@@ -46,7 +46,7 @@ services:
       DB_PORT: 3306
       DB_DATABASE: ${DB_DATABASE:-project_pawl}
       DB_USERNAME: ${DB_USERNAME:-root}
-      DB_PASSWORD: ${DB_PASSWORD:-Harvey.33}
+      DB_PASSWORD: ""
     depends_on:
       db:
         condition: service_healthy
@@ -69,13 +69,11 @@ services:
       - "3307:3306"
     environment:
       MYSQL_DATABASE: ${DB_DATABASE:-project_pawl}
-      # MYSQL_USER: ${DB_USERNAME:-root}
-      # MYSQL_PASSWORD: ${DB_PASSWORD:-Harvey.33}
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-Harvey.33}
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root --silent"]
       interval: 5s
       timeout: 5s
       retries: 12

@@ -9,7 +9,7 @@
                 Sign In
             </a>
             @if (Route::has('register'))
-                <a href="{{ route('register') }}" class="inline-flex w-full max-w-xs items-center justify-center rounded-full bg-whitest px-12 py-3 text-sm font-semibold text-primary shadow-[0_18px_40px_-30px_rgba(36,45,45,0.25)] border border-primary/10 transition duration-200 hover:bg-whitest/95 hover:-translate-y-0.5 active:scale-95">
+                <a href="{{ route('register') }}" class="inline-flex w-full max-w-xs items-center justify-center whitespace-nowrap rounded-full bg-whitest px-12 py-3 text-sm font-semibold text-primary shadow-[0_18px_40px_-30px_rgba(36,45,45,0.25)] border border-primary/10 transition duration-200 hover:bg-whitest/95 hover:-translate-y-0.5 active:scale-95">
                     Sign Up
                 </a>
             @endif

@@ -46,18 +46,7 @@
                             @enderror
                         </div>
 
-                        <!-- Kadaluarsa -->
-                        <div>
-                            <label for="kadaluarsa" class="block text-sm font-medium text-gray-700">
-                                Tanggal Kadaluarsa
-                            </label>
-                            <input type="date" id="kadaluarsa" name="kadaluarsa" value="{{ old('kadaluarsa') }}"
-                                   class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                                   required>
-                            @error('kadaluarsa')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
+                        <input type="hidden" name="kadaluarsa" id="kadaluarsa" value="{{ old('kadaluarsa') }}">
 
                         <!-- Kuantitas & Satuan -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -77,9 +66,13 @@
                                 <label for="satuan" class="block text-sm font-medium text-gray-700">
                                     Satuan
                                 </label>
-                                <input type="text" id="satuan" name="satuan" value="{{ old('satuan') }}" placeholder="kg, pcs, liter, dll"
-                                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                                       required>
+                                <select id="satuan" name="satuan"
+                                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+                                        required>
+                                    @foreach (['kg', 'gram', 'liter', 'ml', 'butir', 'ikat', 'buah', 'bungkus'] as $s)
+                                        <option value="{{ $s }}" {{ old('satuan') === $s ? 'selected' : '' }}>{{ $s }}</option>
+                                    @endforeach
+                                </select>
                                 @error('satuan')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
@@ -99,7 +92,7 @@
                                     <div class="flex text-sm text-gray-600">
                                         <label for="foto" class="relative cursor-pointer bg-white rounded-md font-medium text-primary hover:text-primary/80">
                                             <span>Upload file</span>
-                                            <input id="foto" name="foto" type="file" class="sr-only" accept="image/*" required>
+                                            <input id="foto" name="foto" type="file" class="hidden" accept="image/*" required>
                                         </label>
                                         <p class="pl-1">atau drag and drop</p>
                                     </div>
@@ -130,6 +123,10 @@
     </div>
 
     <script>
+        document.getElementById('tanggal_datang').addEventListener('change', function() {
+            document.getElementById('kadaluarsa').value = this.value;
+        });
+
         const fotoInput = document.getElementById('foto');
         const dropZone = document.getElementById('foto-drop-zone');
         const preview = document.getElementById('foto-preview');

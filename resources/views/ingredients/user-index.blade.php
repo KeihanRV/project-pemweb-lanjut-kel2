@@ -18,6 +18,34 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white rounded-xl shadow-sm sm:rounded-lg mb-6">
+                @php
+                    $currentSortBy = $sortBy ?? request()->query('sort_by');
+                    $currentSortOrder = $sortOrder ?? request()->query('sort_order', 'desc');
+                @endphp
+                <form id="ingredient-filter-form" method="GET" class="p-6 grid gap-4 md:grid-cols-3 items-end">
+                    <input type="hidden" name="sort_by" value="{{ $currentSortBy }}" />
+                    <input type="hidden" name="sort_order" value="{{ $currentSortOrder }}" />
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700">Cari Ingredient</label>
+                        <input id="user-search-input" type="search" name="search" value="{{ $search ?? request()->query('search') }}" placeholder="Cari nama ingredient..." class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Filter Status</label>
+                        <select id="user-status-select" name="status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm">
+                            <option value="all" @selected(($status ?? request()->query('status')) === 'all' || empty($status ?? request()->query('status')))>Semua Status</option>
+                            <option value="Segar" @selected(($status ?? request()->query('status')) === 'Segar')>Segar</option>
+                            <option value="Busuk" @selected(($status ?? request()->query('status')) === 'Busuk')>Busuk</option>
+                            <option value="Unknown" @selected(($status ?? request()->query('status')) === 'Unknown')>Unknown</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center">
+                        <button type="submit" class="inline-flex w-full justify-center items-center px-4 py-2 bg-primary text-whitest rounded-md font-semibold text-sm hover:bg-primary/90 transition duration-150">
+                            Terapkan
+                        </button>
+                    </div>
+                </form>
+            </div>
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     @if ($ingredients->isEmpty())
@@ -38,11 +66,31 @@
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Datang</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kadaluarsa</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kuantitas</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <a href="{{ request()->fullUrlWithQuery(['sort_by' => 'nama', 'sort_order' => $currentSortBy === 'nama' && $currentSortOrder === 'asc' ? 'desc' : 'asc']) }}" class="inline-flex items-center gap-1">
+                                                Nama <span class="text-xs">{{ $currentSortBy === 'nama' ? ($currentSortOrder === 'asc' ? '↑' : '↓') : '↕' }}</span>
+                                            </a>
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <a href="{{ request()->fullUrlWithQuery(['sort_by' => 'tanggal_datang', 'sort_order' => $currentSortBy === 'tanggal_datang' && $currentSortOrder === 'asc' ? 'desc' : 'asc']) }}" class="inline-flex items-center gap-1">
+                                                Tanggal Datang <span class="text-xs">{{ $currentSortBy === 'tanggal_datang' ? ($currentSortOrder === 'asc' ? '↑' : '↓') : '↕' }}</span>
+                                            </a>
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <a href="{{ request()->fullUrlWithQuery(['sort_by' => 'kadaluarsa', 'sort_order' => $currentSortBy === 'kadaluarsa' && $currentSortOrder === 'asc' ? 'desc' : 'asc']) }}" class="inline-flex items-center gap-1">
+                                                Kadaluarsa <span class="text-xs">{{ $currentSortBy === 'kadaluarsa' ? ($currentSortOrder === 'asc' ? '↑' : '↓') : '↕' }}</span>
+                                            </a>
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <a href="{{ request()->fullUrlWithQuery(['sort_by' => 'kuantitas', 'sort_order' => $currentSortBy === 'kuantitas' && $currentSortOrder === 'asc' ? 'desc' : 'asc']) }}" class="inline-flex items-center gap-1">
+                                                Kuantitas <span class="text-xs">{{ $currentSortBy === 'kuantitas' ? ($currentSortOrder === 'asc' ? '↑' : '↓') : '↕' }}</span>
+                                            </a>
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <a href="{{ request()->fullUrlWithQuery(['sort_by' => 'status_kesegaran', 'sort_order' => $currentSortBy === 'status_kesegaran' && $currentSortOrder === 'asc' ? 'desc' : 'asc']) }}" class="inline-flex items-center gap-1">
+                                                Status <span class="text-xs">{{ $currentSortBy === 'status_kesegaran' ? ($currentSortOrder === 'asc' ? '↑' : '↓') : '↕' }}</span>
+                                            </a>
+                                        </th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Foto</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                                     </tr>
@@ -103,4 +151,30 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('user-search-input');
+            const statusSelect = document.getElementById('user-status-select');
+            const form = document.getElementById('ingredient-filter-form');
+
+            const debounce = (fn, delay) => {
+                let timeout;
+                return (...args) => {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => fn(...args), delay);
+                };
+            };
+
+            const submitFilter = () => form.submit();
+
+            if (searchInput) {
+                searchInput.addEventListener('input', debounce(submitFilter, 400));
+            }
+
+            if (statusSelect) {
+                statusSelect.addEventListener('change', submitFilter);
+            }
+        });
+    </script>
 </x-app-layout>

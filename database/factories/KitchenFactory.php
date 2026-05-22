@@ -20,7 +20,7 @@ class KitchenFactory extends Factory
         return [
             'nama' => $this->faker->company() . ' Kitchen',
             'lokasi' => 'Lantai ' . $this->faker->numberBetween(1, 10),
-            'daftar_bahan' => implode(', ', $this->faker->words(5)),
+            // 'daftar_bahan' => implode(', ', $this->faker->words(5)),
             // 'code' tidak perlu diisi karena sudah otomatis di Model
         ];
     }

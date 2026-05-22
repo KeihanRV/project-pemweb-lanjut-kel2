@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Bcrypt;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
+    // use WithoutModelEvents;
 
     /**
      * Seed the application's database.
@@ -25,6 +25,9 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('password'),
             'is_admin' => true,
         ]);
+
+        $this->call(IngredientSeeder::class);
+        $this->call(KitchenSeeder::class);
         
     }
 }

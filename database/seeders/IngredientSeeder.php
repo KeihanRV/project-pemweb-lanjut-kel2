@@ -13,6 +13,10 @@ class IngredientSeeder extends Seeder
      */
     public function run(): void
     {
-        Ingredient::factory()->count(10)->create();
+        // Create some standalone ingredients (not yet assigned to a kitchen)
+        Ingredient::factory()->count(10)->create()->each(function ($ingredient) {
+            // no storage mapping here; kitchens will map ingredients into storages
+        });
+        
     }
 }

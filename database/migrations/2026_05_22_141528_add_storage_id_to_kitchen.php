@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kitchens', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-            $table->string('nama');
-            $table->string('lokasi');
+        Schema::table('kitchens', function (Blueprint $table) {
+            $table->unsignedBigInteger('storage_id')->nullable();
+            $table->foreign('storage_id')->references('id')->on('storages');
         });
     }
 
@@ -24,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('kitchens');
+        Schema::table('kitchen', function (Blueprint $table) {
+            //
+        });
     }
 };

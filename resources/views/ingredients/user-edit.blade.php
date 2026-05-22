@@ -46,18 +46,7 @@
                             @enderror
                         </div>
 
-                        <!-- Kadaluarsa -->
-                        <div>
-                            <label for="kadaluarsa" class="block text-sm font-medium text-gray-700">
-                                Tanggal Kadaluarsa
-                            </label>
-                            <input type="date" id="kadaluarsa" name="kadaluarsa" value="{{ old('kadaluarsa', $ingredient->kadaluarsa) }}"
-                                   class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                                   required>
-                            @error('kadaluarsa')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
+                        <input type="hidden" id="kadaluarsa" name="kadaluarsa" value="{{ old('kadaluarsa', $ingredient->kadaluarsa) }}">
 
                         <!-- Kuantitas & Satuan -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -93,19 +82,7 @@
                             </label>
                             <div class="mt-2 px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
                                 <p class="text-sm">
-                                    @if ($ingredient->status_kesegaran === 'segar')
-                                        <span class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">
-                                            Segar
-                                        </span>
-                                    @elseif ($ingredient->status_kesegaran === 'tidak segar')
-                                        <span class="inline-flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-semibold">
-                                            Tidak Segar
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm font-semibold">
-                                            Tidak Diketahui
-                                        </span>
-                                    @endif
+                                    <x-freshness-badge :status="$ingredient->status_kesegaran" />
                                 </p>
                                 <p class="text-xs text-gray-600 mt-2">Status akan diperbarui jika Anda mengganti foto</p>
                             </div>

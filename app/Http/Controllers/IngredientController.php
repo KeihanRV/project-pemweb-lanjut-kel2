@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Ingredient;
 use App\Models\Kitchen;
 use App\Services\FreshnessService;
+use App\Services\IngredientService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -14,8 +15,22 @@ use Illuminate\View\View;
 class IngredientController extends Controller
 {
     public function __construct(
-        protected FreshnessService $freshnessService
+        protected FreshnessService $freshnessService,
+        protected IngredientService $ingredientService,
     ) {}
+
+    public function bahanMakanan(Request $request): View|RedirectResponse
+    {
+        $user = auth()->user();
+
+        if (!$user->is_admin && !$user->kitchen_id) {
+            return redirect()->route('kitchen-code.show');
+        }
+
+        $data = $this->ingredientService->getListData($request, $user);
+
+        return view('ingredients.index', $data);
+    }
 
     public function index(Request $request): View|RedirectResponse
     {
@@ -132,7 +147,7 @@ class IngredientController extends Controller
             $ingredient->kitchens()->attach($validated['kitchen_id']);
         }
 
-        return redirect()->route('ingredients.index', ['kitchen' => $validated['kitchen_id'] ?? null])
+        return redirect()->route('bahan-makanan')
             ->with('success', 'Ingredient berhasil ditambahkan.');
     }
 
@@ -247,14 +262,14 @@ class IngredientController extends Controller
                 $ingredient->delete();
             }
 
-            return redirect()->route('ingredients.index', ['kitchen' => $kitchenId])
+            return redirect()->route('bahan-makanan')
                 ->with('success', 'Ingredient berhasil dihapus dari kitchen.');
         }
 
         $ingredient->kitchens()->detach();
         $ingredient->delete();
 
-        return redirect()->route('ingredients.index')
+        return redirect()->route('bahan-makanan')
             ->with('success', 'Ingredient berhasil dihapus.');
     }
 

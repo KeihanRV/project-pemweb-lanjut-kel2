@@ -63,19 +63,7 @@
                                                 {{ $item->kuantitas }} {{ $item->satuan }}
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                @if ($item->status_kesegaran === 'segar')
-                                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                        Segar
-                                                    </span>
-                                                @elseif ($item->status_kesegaran === 'tidak segar')
-                                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                                        Tidak Segar
-                                                    </span>
-                                                @else
-                                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                                                        Tidak Diketahui
-                                                    </span>
-                                                @endif
+                                                <x-freshness-badge :status="$item->status_kesegaran" />
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                 @if ($item->foto)

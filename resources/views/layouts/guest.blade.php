@@ -34,7 +34,7 @@
                 <div class="relative z-10 text-center text-primary w-full max-w-2xl px-4">
                     <div class="flex flex-row items-center justify-center gap-6">
                         <img 
-                            src="{{ asset('storage/android-chrome-192x192.png') }}" 
+                            src="{{ asset('images/android-chrome-192x192.png') }}" 
                             alt="Logo SIPEKA" 
                             class="h-20 w-20 sm:h-24 sm:w-24 object-contain drop-shadow-md"
                         >

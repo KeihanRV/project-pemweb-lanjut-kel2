@@ -1,7 +1,5 @@
 <?php
 
-use App\Models\Kitchen;
-use App\Models\Ingredient;
 use Illuminate\Http\Request;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\IngredientController;
@@ -21,22 +19,13 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('ingredients', IngredientController::class)
         ->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+
+    Route::get('/bahan-makanan', [IngredientController::class, 'bahanMakanan'])->name('bahan-makanan');
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'adminIndex'])->name('admin.dashboard');
 });
 
-Route::get('/bahan-makanan', function (Request $request) {
-    // 1. Fetch data required by your index.blade.php file
-    $kitchens = Kitchen::all();
-    $perPage = (int) $request->input('per_page', 10);
-    $selectedKitchen = $request->input('kitchen') ? Kitchen::find($request->input('kitchen')) : null;
-    $ingredients = Ingredient::paginate($perPage);
-
-    // 2. Return the correct path: resources/views/ingredients/index.blade.php
-    return view('ingredients.index', compact('kitchens', 'ingredients', 'selectedKitchen', 'perPage'));
-    
-})->name('bahan-makanan');
 
 require __DIR__.'/auth.php';

@@ -36,6 +36,13 @@
                 <div class="mt-6 space-y-3 max-w-[200px] mx-auto w-full">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
+                            <span class="w-4 h-4 rounded-full bg-[#22C55E]"></span>
+                            <span class="text-gray-700 font-medium">Segar</span>
+                        </div>
+                        <span class="text-gray-500 text-sm">{{ $donutData['segar'] }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
                             <span class="w-4 h-4 rounded-full bg-[#EC221F]"></span>
                             <span class="text-gray-700 font-medium">Busuk</span>
                         </div>
@@ -47,13 +54,6 @@
                             <span class="text-gray-700 font-medium">Unknown</span>
                         </div>
                         <span class="text-gray-500 text-sm">{{ $donutData['tidak diketahui'] }}</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <span class="w-4 h-4 rounded-full bg-[#22C55E]"></span>
-                            <span class="text-gray-700 font-medium">Segar</span>
-                        </div>
-                        <span class="text-gray-500 text-sm">{{ $donutData['segar'] }}</span>
                     </div>
                 </div>
             </div>
@@ -104,14 +104,6 @@
                     </thead>
                     <tbody class="divide-y divide-[#B2C3C4]/40 font-medium">
                         @forelse ($recentIngredients as $ingredient)
-                            @php
-                                $label = match($ingredient->status_kesegaran) {
-                                    'segar'           => ['text' => 'Segar', 'class' => 'bg-[#22C55E]/20 text-[#22C55E]'],
-                                    'tidak segar'     => ['text' => 'Busuk', 'class' => 'bg-[#EC221F] text-white'],
-                                    'tidak diketahui' => ['text' => 'Unknown', 'class' => 'bg-gray-200 text-gray-600'],
-                                    default           => ['text' => '-',     'class' => 'bg-gray-100 text-gray-500'],
-                                };
-                            @endphp
                             <tr class="hover:bg-gray-50/40 transition">
                                 <td class="px-6 py-4">{{ $ingredient->nama }}</td>
                                 <td class="px-6 py-4 text-gray-500">
@@ -122,13 +114,14 @@
                                 </td>
                                 <td class="px-6 py-4 text-gray-500">{{ $ingredient->kuantitas }} {{ $ingredient->satuan }}</td>
                                 <td class="px-6 py-4">
-                                    <span class="{{ $label['class'] }} px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wide">
-                                        {{ $label['text'] }}
-                                    </span>
+                                    <x-freshness-badge :status="$ingredient->status_kesegaran" />
                                 </td>
                                 <td class="px-6 py-4">
                                     @if ($ingredient->foto)
-                                        <a href="{{ asset('storage/' . $ingredient->foto) }}" target="_blank" class="text-[#7EC9CE] hover:underline">Lihat</a>
+                                        <a href="{{ asset('storage/' . $ingredient->foto) }}" target="_blank">
+                                            <img src="{{ asset('storage/' . $ingredient->foto) }}" alt="{{ $ingredient->nama }}"
+                                                 class="h-10 w-10 object-cover rounded-lg shadow-sm hover:shadow-md transition">
+                                        </a>
                                     @else
                                         <span class="text-gray-400">-</span>
                                     @endif
@@ -178,11 +171,11 @@
             data: {
                 datasets: [{
                     data: [
+                        {{ $donutData['segar'] }},
                         {{ $donutData['tidak segar'] }},
-                        {{ $donutData['tidak diketahui'] }},
-                        {{ $donutData['segar'] }}
+                        {{ $donutData['tidak diketahui'] }}
                     ],
-                    backgroundColor: ['#EC221F', '#9CA3AF', '#22C55E'],
+                    backgroundColor: ['#22C55E', '#EC221F', '#9CA3AF'],
                     borderWidth: 0
                 }]
             },

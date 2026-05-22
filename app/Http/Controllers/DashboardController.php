@@ -31,9 +31,9 @@ class DashboardController extends Controller
             ->pluck('total', 'status_kesegaran');
 
         $donutData = [
+            'segar'           => $freshnessCounts->get('segar', 0),
             'tidak segar'     => $freshnessCounts->get('tidak segar', 0),
             'tidak diketahui' => $freshnessCounts->get('tidak diketahui', 0),
-            'segar'           => $freshnessCounts->get('segar', 0),
         ];
 
         // Total ingredient count
@@ -77,9 +77,9 @@ class DashboardController extends Controller
             ->pluck('total', 'status_kesegaran');
 
         $donutData = [
+            'segar'           => $freshnessCounts->get('segar', 0),
             'tidak segar'     => $freshnessCounts->get('tidak segar', 0),
             'tidak diketahui' => $freshnessCounts->get('tidak diketahui', 0),
-            'segar'           => $freshnessCounts->get('segar', 0),
         ];
 
         $kitchens = Kitchen::withCount('ingredients')->orderBy('nama')->get();

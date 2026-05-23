@@ -24,7 +24,7 @@ class IngredientFactory extends Factory
             'satuan' => $this->faker->randomElement(['kg', 'gr', 'liter', 'pcs', 'pack']),
             'kadaluarsa' => $this->faker->dateTimeBetween('now', '+1 year'), // Kadaluarsa di masa depan
             'foto' => 'ingredients/default.jpg', // Path dummy untuk foto
-            'status_kesegaran' => $this->faker->randomElement(['Sangat Segar', 'Segar', 'Hampir Busuk']),
+            'status_kesegaran' => 'Unknown',
         ];
     }
 }

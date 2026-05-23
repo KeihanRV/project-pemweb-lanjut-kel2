@@ -18,6 +18,16 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
+     * Determine if this user is the immutable system user.
+     *
+     * @return bool
+     */
+    public function isSystemUser(): bool
+    {
+        return strtolower($this->email) === strtolower(config('app.system_user_email'));
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

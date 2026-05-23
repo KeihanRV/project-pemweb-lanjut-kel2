@@ -16,7 +16,6 @@ return new class extends Migration
             $table->timestamps();
             $table->string('nama');
             $table->string('lokasi');
-            $table->text('daftar_bahan');
         });
     }
 

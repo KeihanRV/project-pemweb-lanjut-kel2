@@ -14,6 +14,17 @@ return [
     */
 
     'name' => env('APP_NAME', 'Laravel'),
+    /*
+    |--------------------------------------------------------------------------
+    | System User
+    |--------------------------------------------------------------------------
+    |
+    | Email address of the immutable system admin user created by the seeder.
+    | Protected actions in the UI and controllers will check this value.
+    |
+    */
+    'system_user_email' => env('SYSTEM_USER_EMAIL', 'test@example.com'),
+
 
     /*
     |--------------------------------------------------------------------------

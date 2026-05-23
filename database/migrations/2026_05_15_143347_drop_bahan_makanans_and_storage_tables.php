@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::dropIfExists('bahan_makanans');
         Schema::dropIfExists('kitchen_storage_ingredient');
         Schema::dropIfExists('kitchen_storage');
-        Schema::dropIfExists('storages');
+        // Schema::dropIfExists('kitchen_ingredient');
     }
 
     /**

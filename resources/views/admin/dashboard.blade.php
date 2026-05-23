@@ -39,21 +39,21 @@
                             <span class="w-4 h-4 rounded-full bg-[#22C55E]"></span>
                             <span class="text-gray-700 font-medium">Segar</span>
                         </div>
-                        <span class="text-gray-500 text-sm">{{ $donutData['segar'] }}</span>
+                        <span class="text-gray-500 text-sm">{{ $donutData['Segar'] }}</span>
                     </div>
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
                             <span class="w-4 h-4 rounded-full bg-[#EC221F]"></span>
                             <span class="text-gray-700 font-medium">Busuk</span>
                         </div>
-                        <span class="text-gray-500 text-sm">{{ $donutData['tidak segar'] }}</span>
+                        <span class="text-gray-500 text-sm">{{ $donutData['Busuk'] }}</span>
                     </div>
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
                             <span class="w-4 h-4 rounded-full bg-gray-400"></span>
                             <span class="text-gray-700 font-medium">Unknown</span>
                         </div>
-                        <span class="text-gray-500 text-sm">{{ $donutData['tidak diketahui'] }}</span>
+                        <span class="text-gray-500 text-sm">{{ $donutData['Unknown'] }}</span>
                     </div>
                 </div>
             </div>
@@ -171,9 +171,9 @@
             data: {
                 datasets: [{
                     data: [
-                        {{ $donutData['segar'] }},
-                        {{ $donutData['tidak segar'] }},
-                        {{ $donutData['tidak diketahui'] }}
+                        {{ $donutData['Segar'] }},
+                        {{ $donutData['Busuk'] }},
+                        {{ $donutData['Unknown'] }}
                     ],
                     backgroundColor: ['#22C55E', '#EC221F', '#9CA3AF'],
                     borderWidth: 0

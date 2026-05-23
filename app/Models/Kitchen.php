@@ -24,6 +24,11 @@ class Kitchen extends Model
         return $this->belongsToMany(Ingredient::class, 'kitchen_ingredient')->withTimestamps();
     }
 
+    public function storages()
+    {
+        return $this->hasMany(Storage::class, 'kitchen_id');
+    }
+
     protected static function booted()
     {
         static::creating(function ($kitchen) {

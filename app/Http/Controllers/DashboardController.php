@@ -26,14 +26,14 @@ class DashboardController extends Controller
 
         // Freshness distribution for donut chart
         $freshnessCounts = (clone $ingredientQuery)
-            ->select('status_kesegaran', DB::raw('count(*) as total'))
-            ->groupBy('status_kesegaran')
+            ->select(DB::raw('LOWER(status_kesegaran) as status_kesegaran'), DB::raw('count(*) as total'))
+            ->groupBy(DB::raw('LOWER(status_kesegaran)'))
             ->pluck('total', 'status_kesegaran');
 
         $donutData = [
-            'segar'           => $freshnessCounts->get('segar', 0),
-            'tidak segar'     => $freshnessCounts->get('tidak segar', 0),
-            'tidak diketahui' => $freshnessCounts->get('tidak diketahui', 0),
+            'Segar'   => $freshnessCounts->get('segar', 0),
+            'Busuk'   => $freshnessCounts->get('busuk', 0),
+            'Unknown' => $freshnessCounts->get('unknown', 0),
         ];
 
         // Total ingredient count
@@ -57,12 +57,18 @@ class DashboardController extends Controller
             ->paginate(5)
             ->withQueryString();
 
+        // Total user and kitchen counts
+        $totalUsers = User::count();
+        $totalKitchens = Kitchen::count();
+
         return view('dashboard', compact(
             'donutData',
             'totalIngredients',
             'lineLabels',
             'lineData',
             'ingredients',
+            'totalUsers',
+            'totalKitchens',
         ));
     }
 
@@ -72,14 +78,14 @@ class DashboardController extends Controller
         $totalKitchens    = Kitchen::count();
         $totalUsers       = User::count();
 
-        $freshnessCounts = Ingredient::select('status_kesegaran', DB::raw('count(*) as total'))
-            ->groupBy('status_kesegaran')
+        $freshnessCounts = Ingredient::select(DB::raw('LOWER(status_kesegaran) as status_kesegaran'), DB::raw('count(*) as total'))
+            ->groupBy(DB::raw('LOWER(status_kesegaran)'))
             ->pluck('total', 'status_kesegaran');
 
         $donutData = [
-            'segar'           => $freshnessCounts->get('segar', 0),
-            'tidak segar'     => $freshnessCounts->get('tidak segar', 0),
-            'tidak diketahui' => $freshnessCounts->get('tidak diketahui', 0),
+            'Segar'   => $freshnessCounts->get('segar', 0),
+            'Busuk'   => $freshnessCounts->get('busuk', 0),
+            'Unknown' => $freshnessCounts->get('unknown', 0),
         ];
 
         $kitchens = Kitchen::withCount('ingredients')->orderBy('nama')->get();

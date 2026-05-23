@@ -44,7 +44,7 @@ Route::middleware('auth')->group(function () {
         Route::get('kitchen-code', [KitchenCodeController::class, 'show'])
             ->name('kitchen-code.show');
     
-        Route::post('kitchen-code/validate', [KitchenCodeController::class, 'validate'])
+        Route::post('kitchen-code/validate', [KitchenCodeController::class, 'validateCode'])
             ->name('kitchen-code.validate');
             
     Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)

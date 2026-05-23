@@ -24,7 +24,7 @@ class KitchenCodeController extends Controller
     /**
      * Validate and assign kitchen code to user.
      */
-    public function validate(Request $request)
+    public function validateCode(Request $request)
     {
         if (!$request->filled('code')) {
             $request->merge([

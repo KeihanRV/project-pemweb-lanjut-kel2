@@ -35,46 +35,83 @@ class IngredientController extends Controller
     public function index(Request $request): View|RedirectResponse
     {
         $user = auth()->user();
-        $perPage = in_array($request->query('per_page'), ['10', '25', '100'])
-            ? (int) $request->query('per_page')
-            : 10;
+        
+        // 1. Sanitasi Pagination & Sorting
+        $perPage = in_array($request->query('per_page'), ['10', '25', '100']) ? (int) $request->query('per_page') : 10;
+        $search = $request->query('search');
+        $status = $request->query('status');
+        
+        $sortBy = in_array($request->query('sort_by'), ['nama', 'tanggal_datang', 'kadaluarsa', 'kuantitas', 'status_kesegaran'])
+            ? $request->query('sort_by')
+            : 'created_at';
+        $sortOrder = $request->query('sort_order') === 'asc' ? 'asc' : 'desc';
 
-        // If user is admin, show the admin view
+        // dd([
+        //     'Request All' => $request->all(),
+        //     'Sort By Terdeteksi' => $sortBy,
+        //     'Sort Order Terdeteksi' => $sortOrder
+        // ]);
+
+        // 2. Mapping Status (Samakan standarisasi string di DB)
+        $statusMap = match (strtolower($status)) {
+            'segar' => 'Segar',
+            'busuk' => 'Busuk',
+            'unknown' => 'Unknown',
+            default => null,
+        };
+
+        // 3. Alur Logic ADMIN
         if ($user->is_admin) {
             $kitchens = Kitchen::orderBy('nama')->get();
-            $ingredients = Ingredient::orderBy('created_at', 'desc')
-                ->paginate($perPage)
-                ->withQueryString();
             $selectedKitchen = null;
 
+            // Tentukan kitchen mana yang sedang dipilih
             if ($kitchens->isNotEmpty()) {
                 $selectedKitchen = $kitchens->first();
-
                 if ($request->filled('kitchen')) {
                     $selectedKitchen = $kitchens->firstWhere('id', $request->query('kitchen')) ?? $selectedKitchen;
                 }
-
-                $ingredients = $selectedKitchen->ingredients()
-                    ->orderBy('created_at', 'desc')
-                    ->paginate($perPage)
-                    ->withQueryString();
             }
 
-            return view('ingredients.index', compact('ingredients', 'kitchens', 'selectedKitchen', 'perPage'));
+            // Mulai Query Utama dari Model Ingredient agar sorting aman dari ambiguitas pivot
+            $query = Ingredient::query();
+
+            // Filter berdasarkan Kitchen yang dipilh admin (gunakan storages sebagai sumber data)
+            if ($selectedKitchen) {
+                $query->whereHas('storages', function ($q) use ($selectedKitchen) {
+                    $q->where('storages.kitchen_id', $selectedKitchen->id);
+                });
+            }
+
+            // Terapkan Searching & Filtering Status (Gunakan $statusMap hasil konversi!)
+            $ingredients = $query->when($search, fn ($q) => $q->where('ingredients.nama', 'like', "%{$search}%"))
+                ->when($statusMap, fn ($q) => $q->whereRaw('LOWER(ingredients.status_kesegaran) = ?', [strtolower($statusMap)]))
+                ->orderBy("ingredients.{$sortBy}", $sortOrder)
+                ->paginate($perPage)
+                ->withQueryString();
+
+            return view('ingredients.index', compact('ingredients', 'kitchens', 'selectedKitchen', 'perPage', 'search', 'status', 'sortBy', 'sortOrder'));
         }
 
-        // If user is not admin, show user view (ingredients from their kitchen only)
+        // 4. Alur Logic STAFF / USER BIASA
         if (!$user->kitchen_id) {
             return redirect()->route('kitchen-code.show');
         }
 
         $kitchen = $user->kitchen;
-        $ingredients = $kitchen->ingredients()
-            ->orderBy('created_at', 'desc')
+        
+        // Terapkan hal yang sama pada query user biasa (Gunakan $statusMap!)
+        $ingredients = Ingredient::whereHas('storages', function ($q) use ($kitchen) {
+                $q->where('storages.kitchen_id', $kitchen->id);
+            })
+            ->when($search, fn ($q) => $q->where('ingredients.nama', 'like', "%{$search}%"))
+            ->when($statusMap, fn ($q) => $q->whereRaw('LOWER(ingredients.status_kesegaran) = ?', [strtolower($statusMap)]))
+            ->orderBy("ingredients.{$sortBy}", $sortOrder)
             ->paginate($perPage)
             ->withQueryString();
 
-        return view('ingredients.user-index', compact('ingredients', 'kitchen', 'perPage'));
+     
+            return view('ingredients.user-index', compact('ingredients', 'kitchen', 'perPage', 'search', 'status', 'sortBy', 'sortOrder'));
     }
 
     public function create(Request $request): View|RedirectResponse
@@ -133,6 +170,7 @@ class IngredientController extends Controller
         $result = $this->freshnessService->check($absolutePath);
         $status = $this->mapPrediction($result['prediction'] ?? 'unknown');
 
+        // Status kesegaran hanya berasal dari analisis ML; tidak boleh diisi manual.
         $ingredient = Ingredient::create([
             'nama' => $validated['nama'],
             'tanggal_datang' => $validated['tanggal_datang'],
@@ -144,6 +182,13 @@ class IngredientController extends Controller
         ]);
 
         if ($validated['kitchen_id']) {
+            // create storage entry for this kitchen
+            \App\Models\Storage::create([
+                'ingredient_id' => $ingredient->id,
+                'kitchen_id' => $validated['kitchen_id'],
+            ]);
+
+            // keep pivot for backward compatibility
             $ingredient->kitchens()->attach($validated['kitchen_id']);
         }
 
@@ -155,9 +200,9 @@ class IngredientController extends Controller
     {
         $user = auth()->user();
 
-        // If user is not admin, check if ingredient belongs to their kitchen
+        // If user is not admin, check if ingredient belongs to their kitchen using storages
         if (!$user->is_admin) {
-            $userKitchenIds = $ingredient->kitchens()->pluck('kitchens.id')->toArray();
+            $userKitchenIds = $ingredient->storages()->pluck('kitchen_id')->toArray();
             if (!in_array($user->kitchen_id, $userKitchenIds)) {
                 abort(403, 'Unauthorized');
             }
@@ -187,9 +232,9 @@ class IngredientController extends Controller
     {
         $user = auth()->user();
 
-        // If user is not admin, check if ingredient belongs to their kitchen
+        // If user is not admin, check if ingredient belongs to their kitchen using storages
         if (!$user->is_admin) {
-            $userKitchenIds = $ingredient->kitchens()->pluck('kitchens.id')->toArray();
+            $userKitchenIds = $ingredient->storages()->pluck('kitchen_id')->toArray();
             if (!in_array($user->kitchen_id, $userKitchenIds)) {
                 abort(403, 'Unauthorized');
             }
@@ -234,7 +279,14 @@ class IngredientController extends Controller
         $ingredient->update($data);
 
         if ($validated['kitchen_id']) {
-            $ingredient->kitchens()->syncWithoutDetaching([$validated['kitchen_id']]);
+            // ensure storage exists for this kitchen
+            \App\Models\Storage::firstOrCreate([
+                'ingredient_id' => $ingredient->id,
+                'kitchen_id' => $validated['kitchen_id'],
+            ]);
+
+            // keep pivot for backward compatibility
+            // $ingredient->kitchens()->syncWithoutDetaching([$validated['kitchen_id']]);
         }
 
         return redirect()->route('ingredients.index', ['kitchen' => $validated['kitchen_id'] ?? null])
@@ -256,9 +308,16 @@ class IngredientController extends Controller
         $kitchenId = $request->input('kitchen_id');
 
         if ($kitchenId) {
+            // remove storage entry linking this ingredient to the kitchen
+            \App\Models\Storage::where('ingredient_id', $ingredient->id)
+                ->where('kitchen_id', $kitchenId)
+                ->delete();
+
+            // detach pivot for backward compatibility
             $ingredient->kitchens()->detach($kitchenId);
 
-            if ($ingredient->kitchens()->count() === 0) {
+            // if no more storages exist for this ingredient, delete the ingredient
+            if (\App\Models\Storage::where('ingredient_id', $ingredient->id)->count() === 0) {
                 $ingredient->delete();
             }
 
@@ -266,6 +325,8 @@ class IngredientController extends Controller
                 ->with('success', 'Ingredient berhasil dihapus dari kitchen.');
         }
 
+        // delete all storages and pivot and ingredient
+        \App\Models\Storage::where('ingredient_id', $ingredient->id)->delete();
         $ingredient->kitchens()->detach();
         $ingredient->delete();
 
@@ -275,10 +336,10 @@ class IngredientController extends Controller
 
     private function mapPrediction(string $prediction): string
     {
-        return match ($prediction) {
-            'fresh' => 'segar',
-            'spoiled' => 'tidak segar',
-            default => 'tidak diketahui',
+        return match (strtolower($prediction)) {
+            'fresh' => 'Segar',
+            'spoiled' => 'Busuk',
+            default => 'Unknown',
         };
     }
 }

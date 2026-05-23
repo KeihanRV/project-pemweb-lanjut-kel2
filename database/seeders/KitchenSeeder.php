@@ -22,13 +22,20 @@ class KitchenSeeder extends Seeder
             ->count(5)
             ->create()
             ->each(function (Kitchen $kitchen) {
-                $ingredientIds = Ingredient::factory()
+                $ingredients = Ingredient::factory()
                     ->count(rand(8, 20))
-                    ->create()
-                    ->pluck('id')
-                    ->toArray();
+                    ->create();
 
-                $kitchen->ingredients()->attach($ingredientIds);
+                foreach ($ingredients as $ingredient) {
+                    // create storage entry linking ingredient to this kitchen
+                    \App\Models\Storage::create([
+                        'ingredient_id' => $ingredient->id,
+                        'kitchen_id' => $kitchen->id,
+                    ]);
+
+                    // keep pivot for backward compatibility
+                    $kitchen->ingredients()->attach($ingredient->id);
+                }
             });
     }
 }

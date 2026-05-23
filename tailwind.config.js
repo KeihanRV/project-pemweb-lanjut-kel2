@@ -17,6 +17,9 @@ export default {
                 tertiary: "#D1F0F3",
                 whitest: "#E2EFF0",
                 danger: "#E63946",
+                success: "#01b920",
+                warning: "#F4A261",
+                massage: "#264653",
             },
             fontFamily: {
                 sans: ["Plus Jakarta Sans", ...defaultTheme.fontFamily.sans],

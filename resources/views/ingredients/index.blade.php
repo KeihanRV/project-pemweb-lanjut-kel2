@@ -16,10 +16,11 @@
 
             <!-- DIV ATAS: Dropdown Pilih Kitchen & Tombol Tambah Produk (Sejajar) -->
             <div class="bg-white p-6 rounded-xl border border-[#B2C3C4] shadow-sm mb-6 max-w-[1200px] mx-auto">
+                <h2 class="text-3xl font-bold py-4">Daftar Bahan Makanan</h2>
                 <div class="flex flex-col sm:flex-row items-end justify-between gap-4">
                     @if (auth()->user()->is_admin && $kitchens->isNotEmpty())
                         <div class="w-full sm:w-72">
-                            <label class="block text-sm font-medium text-[#242D2D]">Pilih Kitchen</label>
+                            <!-- <label class="block text-sm font-medium text-[#242D2D]">Pilih Kitchen</label> -->
                             <select name="kitchen" id="kitchen-select" class="mt-1 block w-full rounded-md border-[#B2C3C4] shadow-sm focus:border-[#7EC9CE] focus:ring-[#7EC9CE] sm:text-sm">
                                 @foreach ($kitchens as $kitchen)
                                     <option value="{{ $kitchen->id }}" @selected(optional($selectedKitchen)->id == $kitchen->id)>

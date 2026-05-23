@@ -1,61 +1,67 @@
 <section class="text-white">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        <div class="lg:col-span-4 flex justify-center lg:justify-center pt-4">
-            <div class="relative group">
-                @if($user->profile_photo_url)
-                    <img src="{{ $user->profile_photo_url }}" 
-                         alt="{{ $user->name }}" 
-                         class="w-64 h-64 sm:w-72 sm:h-72 lg:w-80 lg:h-80 rounded-full object-cover border-4 border-primary shadow-xl" />
-                @else
-                    <div class="w-64 h-64 sm:w-72 sm:h-72 lg:w-80 lg:h-80 rounded-full bg-whitest border-4 border-primary shadow-xl flex items-center justify-center select-none">
-                        <span class="text-6xl sm:text-7xl font-display text-primary tracking-wider">
-                            @php
-                                $words = explode(' ', $user->name);
-                                $initials = '';
-                                foreach ($words as $w) {
-                                    $initials .= mb_substr($w, 0, 1);
-                                    if (strlen($initials) >= 2) break;
-                                }
-                                echo strtoupper($initials);
-                            @endphp
+        <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="lg:col-span-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            @csrf
+            @method('patch')
+
+            <div class="lg:col-span-4 flex flex-col items-center pt-4">
+                <div class="relative group">
+                    @if($user->avatar)
+                        <img id="avatar-preview" 
+                             src="{{ Storage::url($user->avatar) }}" 
+                             alt="{{ $user->name }}" 
+                             class="w-64 h-64 sm:w-72 sm:h-72 lg:w-80 lg:h-80 rounded-full object-cover border-4 border-primary shadow-xl" />
+                    @elseif($user->profile_photo_url)
+                        <img id="avatar-preview" 
+                             src="{{ $user->profile_photo_url }}" 
+                             alt="{{ $user->name }}" 
+                             class="w-64 h-64 sm:w-72 sm:h-72 lg:w-80 lg:h-80 rounded-full object-cover border-4 border-primary shadow-xl" />
+                    @else
+                        <div id="avatar-placeholder" class="w-64 h-64 sm:w-72 sm:h-72 lg:w-80 lg:h-80 rounded-full bg-whitest border-4 border-primary shadow-xl flex items-center justify-center select-none">
+                            <span class="text-6xl sm:text-7xl font-display text-primary tracking-wider">
+                                @php
+                                    $words = explode(' ', $user->name);
+                                    $initials = '';
+                                    foreach ($words as $w) {
+                                        $initials .= mb_substr($w, 0, 1);
+                                        if (strlen($initials) >= 2) break;
+                                    }
+                                    echo strtoupper($initials);
+                                @endphp
+                            </span>
+                        </div>
+                        <img id="avatar-preview" class="hidden w-64 h-64 sm:w-72 sm:h-72 lg:w-80 lg:h-80 rounded-full object-cover border-4 border-primary shadow-xl" alt="Preview" />
+                    @endif
+
+                    <input id="avatar" name="avatar" type="file" accept="image/jpeg,image/png,image/webp" class="hidden" />
+
+                    <button id="avatar-upload-btn" type="button" class="absolute bottom-4 right-4 bg-primary text-white p-3 rounded-full shadow-lg hover:bg-opacity-90 transition border border-gray-700" aria-label="Edit avatar">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 11l6-6 3 3-6 6H9v-3z" />
+                        </svg>
+                    </button>
+                </div>
+                
+                @error('avatar')
+                    <p class="mt-4 text-xs text-red-500 bg-red-500/10 px-3 py-1.5 rounded-md border border-red-500/20">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="lg:col-span-8">
+                <div class="flex justify-between items-baseline mb-6 border-b border-gray-700/30 pb-4">
+                    <h2 class="text-3xl md:text-4xl font-sans tracking-tight text-gray-900 dark:text-white">
+                        {{ __('Profile') }}
+                    </h2>
+                    <div class="text-right text-xs md:text-sm text-gray-400 font-sans">
+                        <span class="block text-gray-500 text-[11px] uppercase tracking-wider">{{ __('Join since') }}</span>
+                        <span class="font-medium text-gray-300">
+                            {{ $user->created_at ? $user->created_at->format('d F Y') : '-' }}
                         </span>
                     </div>
-                @endif
-
-                <button id="avatar-upload-btn" type="button" class="absolute bottom-4 right-4 bg-primary text-white p-3 rounded-full shadow-lg hover:bg-opacity-90 transition border border-gray-700" aria-label="Edit avatar">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 11l6-6 3 3-6 6H9v-3z" />
-                    </svg>
-                </button>
-            </div>
-        </div>
-
-        <div class="lg:col-span-8">
-            
-            <div class="flex justify-between items-baseline mb-6 border-b border-gray-700/30 pb-4">
-                <h2 class="text-3xl md:text-4xl font-sans tracking-tight text-gray-900 dark:text-white">
-                    {{ __('Profile') }}
-                </h2>
-                <div class="text-right text-xs md:text-sm text-gray-400 font-sans">
-                    <span class="block text-gray-500 text-[11px] uppercase tracking-wider">{{ __('Join since') }}</span>
-                    <span class="font-medium text-gray-300">
-                        {{ $user->created_at ? $user->created_at->format('d F Y') : '-' }}
-                    </span>
                 </div>
-            </div>
-
-            <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data">
-                @csrf
-                @method('patch')
-
-                <input id="avatar" name="avatar" type="file" accept="image/jpeg,image/png,image/webp" class="hidden" />
-                @error('avatar')
-                    <p class="mt-2 text-xs text-red-600">{{ $message }}</p>
-                @enderror
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                    
                     <div class="bg-whitest p-6 rounded-lg shadow-lg space-y-4">
                         <div>
                             <label for="name" class="block text-xs font-semibold text-primary uppercase tracking-wider mb-1">{{ __('Full Name') }}</label>
@@ -71,8 +77,7 @@
 
                         <div>
                             <label for="sppg" class="block text-xs font-semibold text-primary uppercase tracking-wider mb-1">{{ __('SPPG') }}</label>
-                            <x-text-input id="sppg" name="sppg" type="text" class="w-full bg-whitest text-primary font-medium px-3 py-2 rounded border border-primary focus:ring-2 opacity-80 focus:ring-primary focus:border-primary cursor-not-allowed" :value="old('sppg', $user->sppg ?? '-')" disabled />
-                            <x-input-error class="mt-1 text-xs text-red-600" :messages="$errors->get('sppg')" />
+                            <x-text-input id="sppg" name="sppg" type="text" class="w-full bg-whitest text-primary font-medium px-3 py-2 rounded border border-primary focus:ring-2 opacity-80 focus:ring-primary focus:border-primary cursor-not-allowed" :value="$user->kitchen->nama ?? 'N/A'" disabled />
                         </div>
                     </div>
 
@@ -80,7 +85,7 @@
                         <div class="bg-whitest p-6 rounded-lg shadow-lg space-y-4">
                             <div>
                                 <label for="role" class="block text-xs font-semibold text-primary uppercase tracking-wider mb-1">{{ __('Role') }}</label>
-                                <x-text-input id="role" name="role" type="text" class="w-full bg-whitest text-primary font-medium px-3 py-2 rounded border border-primary opacity-80 cursor-not-allowed" :value="old('is_admin', __('Admin') ?? __('User'))" disabled />
+                                <x-text-input id="role" name="role" type="text" class="w-full bg-whitest text-primary font-medium px-3 py-2 rounded border border-primary opacity-80 cursor-not-allowed" :value="$user->is_admin ? __('Admin') : __('User')" disabled />
                             </div>
 
                             <div>
@@ -96,37 +101,48 @@
                             </button>
                         </div>
                     </div>
-
                 </div>
 
                 @if (session('status') === 'profile-updated')
                     <div class="mt-4 flex justify-end">
-                        <p x-data="{ true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)" class="text-sm text-whitest font-medium">{{ __('Saved successfully.') }}</p>
+                        <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 3000)" class="text-sm text-emerald-400 font-medium">{{ __('Saved successfully.') }}</p>
                     </div>
                 @endif
-            </form>
+            </div>
+        </form>
 
-        </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const avatarButton = document.getElementById('avatar-upload-btn');
             const avatarInput = document.getElementById('avatar');
+            const avatarPreview = document.getElementById('avatar-preview');
+            const avatarPlaceholder = document.getElementById('avatar-placeholder');
 
-            if (!avatarButton || !avatarInput) {
-                return;
+            if (avatarButton && avatarInput) {
+                avatarButton.addEventListener('click', function () {
+                    avatarInput.click();
+                });
+
+                avatarInput.addEventListener('change', function () {
+                    const file = this.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            // Pasang gambar hasil unggahan ke elemen img preview
+                            avatarPreview.src = e.target.result;
+                            avatarPreview.classList.remove('hidden');
+                            
+                            // Sembunyikan lingkaran huruf inisial jika sebelumnya aktif
+                            if (avatarPlaceholder) {
+                                avatarPlaceholder.classList.add('hidden');
+                            }
+                        }
+                        reader.readAsDataURL(file);
+                    }
+                });
             }
-
-            avatarButton.addEventListener('click', function () {
-                avatarInput.click();
-            });
-
-            avatarInput.addEventListener('change', function () {
-                if (avatarInput.files.length > 0) {
-                    avatarInput.closest('form').submit();
-                }
-            });
         });
     </script>
 </section>

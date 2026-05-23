@@ -2,17 +2,13 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <div>
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                <h2 class="font-bold text-3xl text-primary leading-tight">
                     {{ __('Penyimpanan Ingredients') }}
                 </h2>
                 <p class="text-sm text-gray-600 mt-1">
                     Kitchen: <span class="font-semibold">{{ $kitchen->nama }}</span> ({{ $kitchen->code }})
                 </p>
             </div>
-            <a href="{{ route('ingredients.create') }}"
-               class="inline-flex items-center px-4 py-2 bg-primary border border-transparent rounded-md font-semibold text-xs text-whitest uppercase tracking-widest hover:bg-primary/90 focus:bg-primary/90 active:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition ease-in-out duration-150">
-                + Input Ingredient Baru
-            </a>
         </div>
     </x-slot>
 
@@ -23,6 +19,17 @@
                     $currentSortBy = $sortBy ?? request()->query('sort_by');
                     $currentSortOrder = $sortOrder ?? request()->query('sort_order', 'desc');
                 @endphp
+                <div class="border-b border-gray-200 px-6 py-4">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-primary">Bahan Makanan</h3>
+                            <p class="text-sm text-gray-500 mt-1">Daftar Bahan Makanan di SPPG {{ $kitchen->nama }}</p>
+                        </div>
+                        <a href="{{ route('ingredients.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg shadow-sm hover:opacity-95 transition duration-150">
+                            + Tambah
+                        </a>
+                    </div>
+                </div>
                 <form id="ingredient-filter-form" method="GET" class="p-6 grid gap-4 md:grid-cols-3 items-end">
                     <input type="hidden" name="sort_by" value="{{ $currentSortBy }}" />
                     <input type="hidden" name="sort_order" value="{{ $currentSortOrder }}" />
@@ -40,9 +47,10 @@
                         </select>
                     </div>
                     <div class="flex items-center">
-                        <button type="submit" class="inline-flex w-full justify-center items-center px-4 py-2 bg-primary text-whitest rounded-md font-semibold text-sm hover:bg-primary/90 transition duration-150">
+                        <!-- <button type="submit" class="inline-flex w-full justify-center items-center px-4 py-2 bg-primary text-whitest rounded-md font-semibold text-sm hover:bg-primary/90 transition duration-150">
                             Terapkan
-                        </button>
+                        </button> -->
+                        
                     </div>
                 </form>
             </div>
@@ -57,8 +65,8 @@
                             </div>
                             <h3 class="text-lg font-medium text-gray-900 mb-2">Belum ada ingredients</h3>
                             <p class="text-gray-600 mb-4">Mulai dengan menambahkan ingredient pertama Anda</p>
-                            <a href="{{ route('ingredients.create') }}" class="inline-flex items-center px-4 py-2 bg-primary text-whitest rounded-md font-semibold text-sm hover:bg-primary/90 transition duration-200">
-                                + Tambah Ingredient Pertama
+                            <a href="{{ route('ingredients.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg shadow-sm hover:opacity-95 transition duration-150">
+                                + Tambah
                             </a>
                         </div>
                     @else
@@ -143,9 +151,21 @@
                             </table>
                         </div>
 
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 mt-6 border-t border-[#B2C3C4]">
+                        <div class="flex items-center gap-2">
+                            <label for="per-page-select" class="text-sm font-medium text-[#242D2D] whitespace-nowrap">Per halaman:</label>
+                            <!-- Ditambahkan atribut form="ingredient-filter-form" agar terikat dengan form filter utama di atas -->
+                            <select name="per_page" id="per-page-select" form="ingredient-filter-form" class="block rounded-md border-[#B2C3C4] shadow-sm focus:border-[#7EC9CE] focus:ring-[#7EC9CE] sm:text-sm py-1 px-3 bg-white">
+                                <option value="10" @selected($perPage === 10)>10</option>
+                                <option value="25" @selected($perPage === 25)>25</option>
+                                <option value="100" @selected($perPage === 100)>100</option>
+                            </select>
+                        </div>
+
                         <div class="mt-6">
                             {{ $ingredients->links() }}
                         </div>
+                        </div>  
                     @endif
                 </div>
             </div>
@@ -166,6 +186,7 @@
                 };
             };
 
+            const perPageSelect = document.getElementById('per-page-select');
             const submitFilter = () => form.submit();
 
             if (searchInput) {
@@ -174,6 +195,10 @@
 
             if (statusSelect) {
                 statusSelect.addEventListener('change', submitFilter);
+            }
+
+            if (perPageSelect) {
+                perPageSelect.addEventListener('change', submitFilter);
             }
         });
     </script>

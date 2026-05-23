@@ -122,6 +122,25 @@ class UserController extends Controller
                          ->with('success', 'Data user berhasil diperbarui!');
     }
 
+    public function toggleAdmin(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        if ($user->isSystemUser()) {
+            return redirect()->route('pengguna-index')
+                             ->with('error', 'Cannot modify system user.');
+        }
+
+        $isAdmin = (bool) $request->input('is_admin');
+        $user->update(['is_admin' => $isAdmin]);
+
+        $message = $isAdmin
+            ? "User {$user->name} sekarang adalah admin!"
+            : "User {$user->name} bukan lagi admin!";
+
+        return redirect()->route('pengguna-index')
+                         ->with('success', $message);
+    }
+
     public function destroy($id)
     {
         $user = User::findOrFail($id);
@@ -154,5 +173,11 @@ class UserController extends Controller
 
         return redirect()->route('pengguna-index')
                          ->with('success', "Hak akses admin berhasil diberikan kepada {$user->name}.");
+    }
+
+    public function getTotalUsers()
+    {
+        $total = User::count();
+        return response()->json(['total_users' => $total]);
     }
 }

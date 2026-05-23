@@ -57,12 +57,18 @@ class DashboardController extends Controller
             ->paginate(5)
             ->withQueryString();
 
+        // Total user and kitchen counts
+        $totalUsers = User::count();
+        $totalKitchens = Kitchen::count();
+
         return view('dashboard', compact(
             'donutData',
             'totalIngredients',
             'lineLabels',
             'lineData',
             'ingredients',
+            'totalUsers',
+            'totalKitchens',
         ));
     }
 

@@ -3,5 +3,5 @@
 
     <button type="submit" class="px-4 py-2 bg-secondary text-white rounded-lg">Cari</button>
 
-    <a href="{{ route('pengguna-index') }}" class="ml-auto text-sm text-gray-500 hover:underline">Reset</a>
+    <!-- <a href="{{ route('pengguna-index') }}" class="ml-auto text-sm text-gray-500 hover:underline">Reset</a> -->
 </form>
